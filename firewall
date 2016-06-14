@@ -1,0 +1,53 @@
+#!/bin/sh
+#default firewall script
+#
+# /etc/rc.local:
+# /root/firewall
+#
+
+IP=""
+
+#MODE
+
+modprobe ip_conntrack
+
+#FLUSH, ZERO
+
+iptables -F
+iptables -Z
+
+#IFACE
+
+iptables -A INPUT -i lo -j ACCEPT
+
+#POLICY
+
+iptables -P INPUT DROP
+iptables -P OUTPUT DROP
+iptables -P FORWARD DROP
+
+#ICMP
+
+iptables -A INPUT -p icmp -j ACCEPT
+
+#TCP
+
+iptables -A INPUT -d $IP -p tcp -m state --state RELATED,ESTABLISHED -j ACCEPT
+iptables -A INPUT -d $IP -p tcp --destination-port 22 -j ACCEPT
+#iptables -A INPUT -d $IP -p tcp --destination-port 80 -j ACCEPT
+#iptables -A INPUT -d $IP -p tcp --destination-port 443 -j ACCEPT
+iptables -A INPUT -d $IP -p tcp --destination-port 3551 -j ACCEPT
+iptables -A INPUT -d $IP -p tcp --destination-port 10000 -j ACCEPT
+iptables -A INPUT -d $IP -p tcp --destination-port 10025:10125 -j ACCEPT
+
+#UDP
+
+iptables -A INPUT -p udp --destination-port 3052 -j ACCEPT
+iptables -A INPUT -d $IP -p udp --source-port 123 -j ACCEPT
+iptables -A INPUT -d $IP -p udp --source-port 53 -j ACCEPT
+
+#OUTPUT
+
+iptables -A OUTPUT -p tcp -m state --state RELATED,ESTABLISHED -j ACCEPT
+iptables -A OUTPUT -p icmp -j ACCEPT
+iptables -A OUTPUT -j ACCEPT

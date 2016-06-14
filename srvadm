@@ -1,0 +1,54 @@
+#!/bin/sh
+#
+# Multiple remote linux server command execution by R.Bruna
+# 
+
+list='
+10.10.76.160
+10.9.1.32
+10.9.1.114
+10.9.1.136
+10.9.1.160
+10.9.1.162
+10.9.1.207
+10.9.1.212
+10.9.1.218
+10.9.1.222
+10.9.1.226
+'
+
+case $1 in
+	
+	-c)
+		if [ -z "$2" -o -z "$3" ]; then
+			echo 'Usage: srvadm -c [source] [destination] {host}'
+			exit 1
+		elif ! [ -f "$2" -o -d "$2" ]; then
+			echo -c '[source]: No such file or directory'
+			exit 2
+		elif [ -z "$4" ]; then
+			for ip in $list; do
+				scp $2 root@$ip:$3
+			done
+		else
+			scp $2 root@$4:$3
+		fi
+	;;
+	-e)
+		if [ -z "$2" ]; then
+			echo "Usage: srvadm -e '[command]' {host}"
+			exit 3
+		elif [ -z "$3" ]; then
+			for ip in $list; do
+				ssh root@$ip $2
+			done
+		else
+			ssh root@$3 $2
+		fi
+	;;
+	-h|*)
+		echo "Usage: srvadm -c [source] [destination] {host} | -e '[command] {host}'"
+	;;
+esac
+
+exit 0

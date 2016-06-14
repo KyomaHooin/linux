@@ -1,0 +1,37 @@
+#!/bin/sh
+#default backup script
+#
+[ -d /backup ] || mkdir /backup
+#
+D="`date +%d`_default_backup" 
+#CHROOT
+cd /root
+#MKDIR
+mkdir $D
+#CONFIG
+config="
+/root/ADMIN.txt
+/root/firewall
+/root/backup
+/root/.bashrc
+/etc/crontab
+/etc/fstab
+/etc/rc.local
+/etc/hosts
+/etc/resolv.conf
+/etc/sysconfig/selinux
+/etc/sysconfig/network-scripts/ifcfg-eth0
+/etc/apcupsd/apcupsd.conf
+/etc/ntp.conf
+/etc/VRTSralus/ralus.cfg
+"
+for src in ${config[@]}; do
+	cp -Hrp $src $D
+done
+#BACKUP
+tar -pczf $D.tar.gz $D 2>/dev/null
+rm -r $D
+mv $D.tar.gz /backup
+find /backup -mtime +1 -delete
+#EXIT
+exit 0
