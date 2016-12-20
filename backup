@@ -32,6 +32,6 @@ done
 tar -pczf $D.tar.gz $D 2>/dev/null
 rm -r $D
 mv $D.tar.gz /backup
-find /backup -mtime +1 -delete
+find /backup -maxdepth 1 -type f -mtime +7 -delete
 #EXIT
 exit 0
