@@ -1,0 +1,20 @@
+#!/bin/bash
+
+/usr/bin/python /root/acme/acme_tiny.py \
+	--account-key /root/acme/acme.key \
+	--csr /root/acme/server.csr \
+	--acme-dir /var/www/.well-known/acme-challenge/ \
+	> /tmp/server.crt || exit 1
+
+/usr/bin/wget -O - https://letsencrypt.org/certs/lets-encrypt-x3-cross-signed.pem > /tmp/X3.pem
+
+[ -s /tmp/server.crt ] && cat /tmp/server.crt > /etc/apache2/acme/server.crt
+[ -s /tmp/X3.pem ] && cat /tmp/X3.pem > /etc/apache2/acme/X3.pem
+
+mv /tmp/server.crt /root/acme/ 2> /dev/null
+mv /tmp/X3.pem /root/acme/ 2> /dev/null
+
+service apache2 restart
+
+exit 0
+
