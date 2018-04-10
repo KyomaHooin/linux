@@ -11,7 +11,7 @@ killall mpg123.bin 2> /dev/null
 #Japan NHK Podcast
 
 if [ "$1" == '-j' ]; then
-	mpg123 -q $(wget -q -O - $URL | grep mp3 | sed -r 's/(.*)(http.*mp3)(.*)/\2/') &
+	mpg123 -q $(wget -q -O - $URL | grep mp3 | sed -r 's/.*(http.*mp3).*/\1/') &
 	exit 0
 fi
 
