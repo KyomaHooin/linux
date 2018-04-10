@@ -3,12 +3,12 @@
 # Template: mpg123 -q -@ &
 #
 
+URL='http://www.nhk.or.jp/r-news/podcast/nhkradionews.xml'
+
 killall mpg123 2> /dev/null
 killall mpg123.bin 2> /dev/null
 
 #Japan NHK Podcast
-
-URL='http://www.nhk.or.jp/r-news/podcast/nhkradionews.xml'
 
 if [  "$1" == '-j' ]; then
 	mpg123 -q $(wget -q -O - $URL | grep mp3 | sed -r 's/(.*)(http.*mp3)(.*)/\2/') &
@@ -17,5 +17,5 @@ fi
 
 #Smooth Lounge Radio
 
-mpg123 -q -@ http://fr1.lounge-radio.com:80/lounge128.mp3 &
+mpg123 -q http://fr1.lounge-radio.com:80/lounge128.mp3 &
 
