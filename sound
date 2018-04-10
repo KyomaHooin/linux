@@ -10,12 +10,12 @@ killall mpg123.bin 2> /dev/null
 
 #Japan NHK Podcast
 
-if [  "$1" == '-j' ]; then
+if [ "$1" == '-j' ]; then
 	mpg123 -q $(wget -q -O - $URL | grep mp3 | sed -r 's/(.*)(http.*mp3)(.*)/\2/') &
 	exit 0
 fi
 
 #Smooth Lounge Radio
 
-mpg123 -q http://fr1.lounge-radio.com:80/lounge128.mp3 &
+mpg123 -q 'http://fr1.lounge-radio.com:80/lounge128.mp3' &
 
