@@ -1,0 +1,370 @@
+#!/bin/sh
+# Debian - Cisco workz.
+# REQUIRE: dynamips, pemu, Cisco IOS, Cisco PIXOS
+# TODO
+#
+# -pix config
+# -pix nowait
+# -pix vlan
+# -pix bios
+# -pix flash
+# -pix actiavation
+#
+# -PA-4B
+# -PA-MC-8TE1
+# -WIC-1T
+
+MIPS="dynamips-0.2.8-RC2-x86.bin"
+PEMU="pemu-2008-03-03-x86.bin"
+
+router_ios()
+	{
+	IOSS=(1700 2600 3620 3640 3660 3745 7200)
+	IOSZ="6"
+	IOS="7200.image"
+
+	echo -n "CHANGE IOS? [no]: "; read CHIOS
+	
+	if [ "$CHIOS" = yes ]; then
+		echo "[0] Cisco 1700 IPSec 3DES/IDS/SS7 12.3(23)"
+		echo "[1] Cisco 2600 IPSec 3DES 12.4(12)"
+		echo "[2] Cisco 3620 IP/FW/IDS 12.2(3)"
+		echo "[3] Cisco 3640 Enterprise/IP+ 12.2(3.1)"
+		echo "[4] Cisco 3660 Enterprise/IP/FW/IDS/IP+/VoFR/MGCP 12.0(7.XK2)"
+		echo "[5] Cisco 3745 IPSec 3DES/IDS/IP+ 12.3(9)"
+		echo "[6] Cisco 7200 Enterprise/FW/IDS IPsec 3DES 12.3(18)"
+		echo -n "IOS [6]: "; read IOSZ
+
+		IOS="${IOSS[${IOSZ}]}.image"
+	fi
+	}
+router_config()
+	{
+	CONFS=()
+	CONFZ=1
+	CONF="-C 7200.cfg"
+	C=0
+
+	echo -n  "CHANGE CONFIG? [no]: "; read CHCONF
+
+	if [ "$CHCONF" = yes ]; then 
+		for CFG in $(ls *.cfg); do echo "[$C] $CFG"
+			CONFS[$C]=$CFG
+			((C++))
+		done
+		
+		echo -n "CONFIG [1]: "; read CONFZ
+		echo -n  "VIEW CONFIG? [no]: "; read VCONF
+		
+		if [ "$VCONF" = yes ]; then cat ${CONFS[${CONFZ}]} | more
+		fi
+		
+		echo -n  "EDIT CONFIG? [no]: "; read ECONF
+		
+		if [ "$ECONF" = yes ]; then vi ${CONFS[${CONFZ}]}
+		fi
+
+		CONF="-C ${CONFS[${CONFZ}]}"
+	fi
+	}
+router_platform()
+	{
+	PLATFORMS=(1700 2600 3600 3725 3745 7200)
+	PLATFORMZ=5
+	PLATFORM="-P 7200"
+
+	echo -n  "CHANGE PLATFORM? [no]: "; read CHPLATFORM
+
+	if [ "$CHPLATFORM" = yes ]; then 
+		for ((P=0; P < ${#PLATFORMS[*]}; P++)); do echo [$P] ${PLATFORMS[${P}]}
+		done
+
+		echo -n "PLATFORM [5]: ";read PLATFORMZ
+		
+		PLATFORM="-P ${PLATFORMS[${PLATFORMZ}]}"
+	fi
+	}
+router_npe()
+	{
+	NPES=(npe-100 npe-150 npe-175 npe-200 npe-225 npe-300 npe-400 npe-g1 npe-g2)
+	NPEZ=6
+	NPE="-t npe-400"
+
+	echo -n "CHANGE NPE? [no]: "; read CHNPE
+
+	if [ "$CHNPE" = yes ]; then
+		for (( N=0; N < ${#NPES[*]}; N++)); do echo [$N] ${NPES[${N}]}
+		done
+
+		echo -n "NPE [6]: ";read NPEZ
+		
+		NPE="-t ${NPES[${NPEZ}]}"
+	fi
+	}
+router_instance()
+	{
+	INST="-c 0"
+	INSTZ=0
+
+	echo -n "CHANGE INSTANCE? [no]: "; read CHINST
+
+	if [ "$CHINST" = yes ]; then echo  -n "INSTANCE [0]: "; read INSTZ
+		INST="-c $INSTZ"
+	fi
+	}
+router_ghost()
+	{
+	GHOST="-G 7200_ghost_ram"
+	GOHSTZ="7200_ghost_ram"
+
+	echo -n "CHANGE GHOST? [no]: "; read CHGHOST
+
+	if [ "$CHGHOST" = yes ]; then echo  -n "GHOST [7200_ghost_ram]:"; read GHOSTZ
+		GHOST="-c $GHOSTZ"
+	fi
+	}
+router_port()
+	{
+	PORTR="-T 2000"
+	PORTZ=2000
+
+	echo -n "CHANGE PORT? [no]: "; read CHPORTR
+
+	if [ "$CHPORTR" = yes ]; then echo  -n "PORT [2000]: "; read PORTRZ
+		PORTR="-T $PORTRZ"
+	fi
+	}
+router_midplane()
+	{
+	MIDPLANES=(std vxr)
+	MIDPLANEZ=1
+	MIDPLANE="-M vxr"
+
+	echo -n "CHANGE MIDPLANE? [no]: "; read CHMIDPLANE
+
+	if [ "$CHMIDPLANE" = yes ]; then
+		echo "[0] std"
+		echo "[1] vxr"
+		echo -n "MIDPLANE [1]: ";read MIDPLANEZ
+
+		MIDPLANE="-M ${MIDPLANES[${MIDPLANEZ}]}"
+	fi
+	}
+router_adapter()
+	{
+	ETHS=(PA-4E PA-8E)
+	FES=(PA-FE-TX PA-2FE-TX C7200-IO-FE C7200-IO-2FE)
+	GS=(PA-GE C7200-IO-GE-E)
+	SS=(PA-T+ PA-8T)
+	AS=(PA-A1)
+	PS=(PA-POS-OC3)
+	PAS=(ETHS FES GS SS AS PS)
+	PA=()
+
+	echo -n "CHANGE ADAPTER? [no]: "; read CHPA
+
+	if [ "$CHPA" = yes ]; then
+		for (( A=0; A < ${#PAS[*]}; A++)); do echo [$A] ${PAS[$A]}:
+			for (( P=0; P < `eval echo ""\$\{\#${PAS[$A]}\[\*\]\}""`; P++)); do
+				echo -n "[$P] " && eval echo \${${PAS[$A]}[\$P]}
+			done
+		
+			echo -n "[$A] ${PAS[$A]}: "; read PASZ
+		
+			PA[$A]=`eval echo "-p $(($A + 1)):"\$\{${PAS[$A]}\[\$PASZ\]\}""`
+		done
+	fi
+	}
+router_module()
+	{
+	ETHS=(NM-1E NM-4E)
+	FES=(NM-1FE-TX)
+	SS=(NM-4T)
+	NMS=(ETHS FES SS)
+	NM=()
+
+	echo -n "CHANGE MODULE? [no]: "; read CHMOD
+
+	if [ "$CHMOD" = yes ]; then
+		for (( M=0; M < ${#NMS[*]}; M++)); do echo [$M] ${NMS[$M]}:
+			for (( P=0; P < `eval echo ""\$\{\#${NMS[$M]}\[\*\]\}""`; P++)); do
+				echo -n "[$P] " && eval echo \${${NMS[$M]}[\$P]}
+			done
+		
+			echo -n "[$M] ${NMS[$M]}: "; read NMSZ
+		
+			NM[$M]=`eval echo "-p $(($M + 1)):"\$\{${NMS[$M]}\[\$NMSZ\]\}""`
+		done
+	fi
+	}
+router_start()
+	{
+	echo
+	echo -n "START $IOS? [no]: "; read STARTR
+	echo
+
+	if [ "$STARTR" = yes ]; then ./$MIPS $CONF $INST $GHOST $PORTR $MIDPLANE $PLATFORM $NPE ${PA[@]} ${NM[@]} $IOS & 2> /dev/null
+	fi  
+	}
+pix_ios()
+	{
+	PIXOSS=(707 723 802)
+	PIXOSZ=2
+	PIXOS="pix802.bin"
+
+	echo -n "CHANGE PIXIOS? [no]: "; read CHPIXOS
+
+	if [ "$CHPIXOS" = yes ]; then
+		echo "[0] Cisco 525 PIX Firewall Security Appliance 7.0(7)"
+		echo "[1] Cisco 525 PIX Firewall Security Appliance 7.2(3)"
+		echo "[2] Cisco 525 PIX Firewall Security Appliance 8.0(2)"
+		echo -n "PIXOS [2]: "; read PIXOSZ
+
+		PIXOS="pix${PIXOSS[${PIXOSZ}]}.bin"
+	fi
+	}
+pix_nio()
+	{
+	NIOS=(00:00:00:00:00:01	00:00:00:00:00:02 00:00:00:00:00:03 00:00:00:00:00:04 00:00:00:00:00:05	00:00:00:00:00:06)
+	NIO="-net nic,macaddr=00:00:00:00:00:01 -net nic,macaddr=00:00:00:00:00:02 -net nic,macaddr=00:00:00:00:00:03"
+
+	echo -n "CHANGE NIO? [no]: "; read CHNIO
+
+	if [ "$CHNIO" = yes ]; then
+		for (( I=0; I < ${#NIOS[*]}; I++)); do echo [$I] ${NIOS[${I}]}
+		done
+
+		for (( I=0; I < ${#NIOS[*]}; I++)); do echo -n "NIO $I [${NIOS[${I}]}]: "; read NIOZ
+			NIOS[${I}]="-net nic,macaddr=$NIOZ"
+		done
+
+		NIO=${NIOS[*]}
+	fi
+	}
+pix_port()
+	{
+	PORTP="-serial telnet::4000,server"
+	PORTPZ="4000"
+
+	echo -n "CHANGE PORT? [no]: "; read CHPORTP
+
+	if [ "$CHPORTP" = yes ]; then echo  -n "PORT [4000]:"; read PORTPZ
+		PORTP="-serial telnet::$PORTPZ,server"
+	fi
+	}
+pix_ram()
+	{
+	RAM="-m 128"
+	RAMZ=128
+
+	echo -n "CHANGE RAM? [no]: "; read CHRAM
+
+	if [ "$CHRAM" = yes ]; then echo  -n "RAM [128]: "; read RAMZ
+		RAM="-m $RAMZ"
+	fi
+	}
+pix_start()
+	{
+	echo
+	echo -n "START $PIXOS? [no]: "; read STARTR
+	echo
+
+	if [ "$STARTR" = yes ]; then ./$PEMU $RAM ${NIO[@]} $PORTP $PIXOS & 2> /dev/null
+	fi  
+	}
+lab_lab()
+	{
+	LABS=()
+	LABZ=0
+	LAB="3620.net"
+	L=0
+
+	echo -n  "CHANGE LAB? [no]: "; read CHLAB
+
+	if [ "$CHLAB" = yes ]; then 
+		for NET in $(ls *.net); do echo "[$L] $NET"
+			LABS[$L]=$NET
+			((L++))
+		done
+		
+		echo -n "LAB [0]: "; read LABZ
+		echo -n  "VIEW LAB? [no]: "; read VLAB
+		
+		if [ "$VLAB" = yes ]; then cat ${LABS[${LABZ}]} | more
+		fi
+		
+		echo -n  "EDIT LAB? [no]: "; read ELAB
+		
+		if [ "$ELAB" = yes ]; then vi ${LABS[${LABZ}]}
+		fi
+
+		LAB="${LABS[${LABZ}]}"
+	fi
+	}
+lab_start()
+	{
+	echo
+	echo -n "START $LAB? [no]: "; read STARTL
+	echo
+
+	if [ "$STARTL" = yes ]; then
+		./$MIPS -H 7000 [127.0.0.1] 2> /dev/null &
+		sleep 5
+		if ! [ "`cat $LAB | grep pemu`" = "" ]; then
+			python pemuwrapper.py 2> /dev/null &
+			sleep 5
+		fi
+		./dynagen $LAB
+	fi
+	}
+all_stop()
+	{
+	echo -n "STOP? [no]: "; read KILL
+	echo
+	
+	if [ "$KILL" = yes ]; then
+		kill `pidof python` 2>/dev/null
+		kill `pidof $PEMU` 2>/dev/null
+		kill `pidof $MIPS` 2>/dev/null
+	fi
+	}
+
+#CISCO WORKZ
+
+clear
+cd /etc/dynagen-0.11.0/
+
+echo "###############"
+echo "# CISCO WORKZ #"
+echo "###############"
+echo
+echo "[0] PIX"
+echo "[1] ROUTER"
+echo "[2] LAB"
+echo
+echo -n "START? [no]: "; read START
+
+if [ "$START" = "0" ]; then
+		pix_ios
+		pix_ram
+		pix_nio
+		pix_port
+		pix_start
+	elif [ "$START" = 1 ]; then
+		router_ios
+		router_config
+		router_platform
+		router_instance
+		router_ghost
+		router_port
+		router_midplane
+		router_npe
+		router_adapter
+		router_module
+		router_start
+	elif [ "$START" = 2 ]; then
+		lab_lab
+		lab_start
+fi
+		all_stop
+exit 0

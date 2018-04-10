@@ -1,0 +1,38 @@
+#!/bin/sh
+#Cisco VXR 7206 / PIX 525 boot loader
+#
+# TODO
+#
+# -pix bios
+# -pix config
+# -pix activation
+
+MIPS="dynamips-0.2.8-RC2-x86.bin"
+PEMU="pemu-2008-03-03-x86.bin"
+
+cd /etc/dynagen-0.11.0/
+
+if [ -x $MIPS -a $PEMU ]; then
+	#PIX FLASH
+	cp pix802.bcp pix802.bin 2> /dev/null
+	sleep 2
+	#525
+	./$PEMU -m 128 \
+		-net nic,macaddr=00:00:00:00:00:01 \
+		-net nic,macaddr=00:00:00:00:00:02 \
+		-net nic,macaddr=00:00:00:00:00:03 \
+		-serial telnet::4000,server \
+	pix802.bin & 2> /dev/null && sleep 10 
+	#7200
+	./$MIPS -C 7200.cfg -i 0 -G 7200_ghost_ram -T 2000 \
+	 	-M vxr -P 7200 -t npe-400 \
+ 		-p 1:C7200-IO-FE \
+		-p 2:PA-4E \
+		-p 3:PA-4T+ \
+		-p 4:PA-A1 \
+		-p 5:PA-POS-OC3 \
+		-p 6:PA-GE \
+	7200.image & 2> /dev/null
+fi
+
+exit 0
