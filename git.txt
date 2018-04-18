@@ -1,0 +1,37 @@
+git config --global user.name "KyomaHooin"
+git config --global user.email "email@address"
+
+FIRST COMMIT
+
+git init
+git add .
+git commit -m "First commit." <file>
+git remote add origin git@github.com:/KyomaHooin/repo
+git push origin master
+
+ADD FILE
+
+git add -u
+git add .
+git commit -m "Descr." <file>
+git push origin master
+
+REMOVE FILE
+
+git rm <file>
+git commit -m "Obsolate." <file>
+git push origin master
+
+UPDATE
+
+git pull --rebase origin master
+
+RESET UNSTAGED COMMIT
+
+git reset --hard HEAD^
+git pull --rebase origin master
+
+LIST CONFIG
+
+git config -l
+

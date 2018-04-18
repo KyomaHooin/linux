@@ -12,6 +12,7 @@ cisco-boot - Dynamips emulator rc script.
   firewall - Simple table firewall.
      sound - CLI radio player.
     srvadm - Multiple SSH remote.
+   git.txt - Git cheat sheet.
 </pre>
 CONTACT
 
