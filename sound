@@ -1,21 +1,19 @@
 #!/bin/bash
 #
-# Template: mpg123 -q -@ &
-#
 
 URL='http://www.nhk.or.jp/r-news/podcast/nhkradionews.xml'
+DWARF=('red.dwarf*' 'red_dwarf_12*' 'red_dwarf_11_[03..06]*' 'red_dwarf_11_[01..02]*')
 
 killall mpg123 2> /dev/null
 killall mpg123.bin 2> /dev/null
 
-#Japan NHK Podcast
-
-if [ "$1" == '-j' ]; then
-	mpg123 -q $(wget -q -O - $URL | grep mp3 | sed -r 's/.*(http.*mp3).*/\1/') &
-	exit 0
-fi
-
-#Smooth Lounge Radio
-
-mpg123 -q 'http://fr1.lounge-radio.com:80/lounge128.mp3' &
-
+case $1 in
+	-j)# Japan NHK Podcast
+		mpg123 -q $(wget -q -O - $URL | grep mp3 | sed -r 's/.*(http.*mp3).*/\1/') &
+	;;
+	-d)# Random Red Dward 10/11/12
+		mpg123 -q -z /root/dwarf/${DWARF[$(($RANDOM % 4))]} &
+	;;
+	*)# Smooth Lounge Radio
+		mpg123 -q 'http://fr1.lounge-radio.com:80/lounge128.mp3' &
+esac
