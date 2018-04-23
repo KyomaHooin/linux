@@ -11,7 +11,7 @@ case $1 in
 	-j)# Japan NHK Podcast
 		mpg123 -q $(wget -q -O - $URL | grep mp3 | sed -r 's/.*(http.*mp3).*/\1/') &
 	;;
-	-d)# Random Red Dward 10/11/12
+	-d)# Random Red Dwarf 10/11/12 episodes
 		mpg123 -q -z /root/dwarf/${DWARF[$(($RANDOM % 4))]} &
 	;;
 	*)# Smooth Lounge Radio
