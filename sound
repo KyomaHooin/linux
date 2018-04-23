@@ -14,6 +14,9 @@ case $1 in
 	-d)# Random Red Dwarf 10/11/12 episodes
 		mpg123 -q -z /root/dwarf/${DWARF[$(($RANDOM % 4))]} &
 	;;
+	-h)# Usage
+		echo -e "Usage: sound [OPTION]\n-j [NHK Podcast]\n-d [Red Dwarf]"
+	;;
 	*)# Smooth Lounge Radio
 		mpg123 -q 'http://fr1.lounge-radio.com:80/lounge128.mp3' &
 esac
