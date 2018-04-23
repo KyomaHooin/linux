@@ -17,3 +17,4 @@ case $1 in
 	*)# Smooth Lounge Radio
 		mpg123 -q 'http://fr1.lounge-radio.com:80/lounge128.mp3' &
 esac
+
