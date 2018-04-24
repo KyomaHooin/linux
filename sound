@@ -2,7 +2,7 @@
 #
 
 URL='http://www.nhk.or.jp/r-news/podcast/nhkradionews.xml'
-DWARF=('red.dwarf*' 'red_dwarf_12*' 'red_dwarf_11_[03..06]*' 'red_dwarf_11_[01..02]*')
+DWARF=('red.dwarf*' 'red_dwarf_12*' 'red_dwarf_11_0*' 'red_dwarf_11_1*')
 
 killall mpg123 2> /dev/null
 killall mpg123.bin 2> /dev/null
