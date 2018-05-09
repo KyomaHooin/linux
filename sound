@@ -22,7 +22,13 @@ case $1 in
 		sleep 4000 && halt &
 	;;
 	-h)# Usage
-		echo -e "Usage: sound [OPTION]\n -j             NHK Podcast\n -n <lesson ..> Nihongo lesson\n -d             Red Dwarf\n -k             Stop"
+		cat <<- EOL
+			Usage: sound [OPTION]
+			-d             Red Dwarf
+			-j             NHK Podcast
+			-n <lesson ..> Nihongo lesson
+			-k             Stop
+		EOL
 	;;
 	-k)# Stop the music
 	;;
