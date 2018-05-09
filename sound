@@ -14,20 +14,19 @@ case $1 in
 		mpg123 -q $(wget -q -O - $URL | grep mp3 | sed -r 's/.*(http.*mp3).*/\1/') &
 	;;
 	-n)# Nihongo lesson
-			shift; for lesson in $@; do LIST+=" /root/nihongo/$lesson*"; done
-			mpg123 -q $LIST 2> /dev/null &
+		shift; for lesson in $@; do LIST+=" /root/nihongo/$lesson*"; done
+		mpg123 -q $LIST 2> /dev/null &
 	;;
 	-d)# Random Red Dwarf 10/11/12 episodes
 		mpg123 -q -z /root/dwarf/${DWARF[$(($RANDOM % 4))]} &
-		sleep 4000 && halt &
 	;;
 	-h)# Usage
 		cat <<- EOL
 			Usage: sound [OPTION]
-			-d             Red Dwarf
-			-j             NHK Podcast
-			-n <lesson ..> Nihongo lesson
-			-k             Stop
+			 -d             Red Dwarf
+			 -j             NHK Podcast
+			 -n <lesson ..> Nihongo lesson
+			 -k             Stop
 		EOL
 	;;
 	-k)# Stop the music
