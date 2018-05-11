@@ -2,7 +2,7 @@
 #
 
 URL='http://www.nhk.or.jp/r-news/podcast/nhkradionews.xml'
-DWARF=('red.dwarf*' 'red_dwarf_12*' 'red_dwarf_11_0*' 'red_dwarf_11_1*')
+URL2='http://fr1.lounge-radio.com:80/lounge128.mp3'
 
 if [[ "$1" != '-h' ]]; then
 	killall mpg123 2> /dev/null
@@ -17,9 +17,6 @@ case $1 in
 		shift; for lesson in $@; do LIST+=" /root/nihongo/$lesson*"; done
 		mpg123 -q $LIST 2> /dev/null &
 	;;
-	-d)# Random Red Dwarf 10/11/12 episodes
-		mpg123 -q -z /root/dwarf/${DWARF[$(($RANDOM % 4))]} &
-	;;
 	-h)# Usage
 		cat <<- EOL
 			Usage: sound [OPTION]
@@ -32,6 +29,6 @@ case $1 in
 	-k)# Stop the music
 	;;
 	*)# Smooth Lounge Radio
-		mpg123 -q 'http://fr1.lounge-radio.com:80/lounge128.mp3' &
+		mpg123 -q $URL2 &
 esac
 
