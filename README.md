@@ -14,7 +14,7 @@ cisco-boot - Dynamips emulator rc script.
     srvadm - Multiple SSH remote.
    git.txt - Git cheat sheet.
 </pre>
-CONTACT
+SOURCE
 
-Source: https://github.com/KyomaHooin/linux
+https://github.com/KyomaHooin/linux
 
