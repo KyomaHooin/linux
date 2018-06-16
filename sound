@@ -20,10 +20,10 @@ case $1 in
 	-h)# Usage
 		cat <<- EOL
 			Usage: sound [OPTION]
-			 -d             Red Dwarf
-			 -j             NHK Podcast
+			 -j             NHK podcast
 			 -n <lesson ..> Nihongo lesson
-			 -k             Stop
+			 -h             Print usage
+			 -k             Just stop music
 		EOL
 	;;
 	-k)# Stop the music
