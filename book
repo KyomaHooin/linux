@@ -1,0 +1,41 @@
+#!/usr/bin/python
+
+import poplib,smtplib,time
+from email.mime.text import MIMEText
+
+INSRV='pop3.seznam.cz'
+INBOX='xx@email.cz'
+INPASS='xx'
+OUTUSR='root@root.cz'
+OUTSRV='smtps21.cz.o2.com'
+OUTBOX='+420xxx@sms.cz.o2.com'
+
+msg = MIMEText('Book!')
+msg['From'] = OUTUSR
+msg['To'] = OUTBOX
+
+TOKEN=True;
+
+f = open('/var/log/book.log','a')
+
+while 1:
+    if time.gmtime()[4] % 10 == 0 and TOKEN:
+        TOKEN = False
+        try:
+            s = poplib.POP3(INSRV,timeout=15)
+            s.user(INBOX)
+            s.pass_(INPASS)
+            m = s.stat()[0]
+            s.quit()
+            if m > 0:
+                mail = smtplib.SMTP(OUTSRV)
+                mail.sendmail(OUTUSR,OUTBOX,msg.as_string())
+                mail.quit()
+        except:
+            f.write('Get/send error.\n')
+            pass
+    if time.gmtime()[4] % 10 == 1: TOKEN=True
+    time.sleep(5)
+
+f.close()
+
