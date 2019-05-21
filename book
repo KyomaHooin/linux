@@ -14,12 +14,15 @@ msg = MIMEText('Book!')
 msg['From'] = OUTUSR
 msg['To'] = OUTBOX
 
-TOKEN=True;
+TOKEN=True
+NOTIFY=True
+
+#-----------------
 
 f = open('/var/log/book.log','a')
 
 while 1:
-    if time.gmtime()[4] % 10 == 0 and TOKEN:
+    if time.gmtime()[4] % 30 == 0 and TOKEN:
         TOKEN = False
         try:
             s = poplib.POP3(INSRV,timeout=15)
@@ -27,14 +30,16 @@ while 1:
             s.pass_(INPASS)
             m = s.stat()[0]
             s.quit()
-            if m > 0:
+            if m > 0 and NOTIFY:
                 mail = smtplib.SMTP(OUTSRV)
                 mail.sendmail(OUTUSR,OUTBOX,msg.as_string())
                 mail.quit()
+                NOTIFY=False
+            if m == 0 and not NOTIFY: NOTIFY=True
         except:
             f.write('Get/send error.\n')
             pass
-    if time.gmtime()[4] % 10 == 1: TOKEN=True
+    if time.gmtime()[4] % 30 == 1: TOKEN=True
     time.sleep(5)
 
 f.close()
