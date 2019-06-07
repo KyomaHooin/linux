@@ -1,0 +1,46 @@
+#!/usr/bin/python
+
+import httplib,re#lxml
+
+def price(v,c):# (price + shipping) * exchange
+	if c == 'eur': return (v + 3) * 25.8
+	if c == 'gpb': return (v + 4.02) * 29
+
+def parse_de():
+	try:
+		c = httplib.HTTPSConnection('www.amazon.de','443',timeout=15)
+		c.request('GET','/gp/offer-listing/1841499897/')
+		r = c.getresponse()
+
+		if r.status == 200:
+			data = r.read()
+			for LINE in data.split('\n'):
+				if 'olpOfferPrice' in LINE:
+					PRICE = float(re.sub(',','.',re.sub('.*> +EUR (.*) +.*','\\1',LINE)))
+					if (PRICE + 3) * 25.8 < 150:
+						return 1
+		c.close()
+		return 0
+	except:
+		print("DE parse fail.")
+
+def parse_uk():
+	try:
+		c = httplib.HTTPSConnection('www.amazon.co.uk','443',timeout=15)
+		c.request('GET','/gp/offer-listing/1841499897/')
+		r = c.getresponse()
+		if r.status == 200:
+			data = r.read()
+			for LINE in data.split('\n'):
+				if 'olpOfferPrice' in LINE:
+					PRICE = float(re.sub('.*> +\xc2\xa3(.*) +.*','\\1',LINE))# \c2\a3 => GBP
+					if (PRICE + 4.02) * 29 < 150:
+						return 1
+		c.close()
+		return 0
+	except:
+		print("UK parse fail.")
+
+if parse_uk(): print "UK!"
+if parse_de(): print "DE!"
+
