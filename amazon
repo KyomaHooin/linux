@@ -7,7 +7,7 @@
 #   -SMS notify
 #
 
-import httplib,lxml,re
+import StringIO,httplib,lxml.html,re
 
 BOOKID='1841499897'
 SERVER={'EUR':'www.amazon.de','GBP':'www.amazon.co.uk'}
@@ -32,20 +32,33 @@ def currency(curr):
 #print currency('GBP')
 
 def parse_offer(curr):
-    #try:
-        c = httplib.HTTPSConnection(SERVER[curr],'443',timeout=15)
-        c.request('GET','/gp/offer-listing/' + BOOKID + '/')
-        r = c.getresponse()
-        if r.status == 200:
-            data = r.read()
-	    for LINE in data.split('\n'):
-                if 'olpOfferPrice' in LINE:
-                    if curr == 'EUR':
-                        PRICE = float(re.sub(',','.',re.sub('.*> +EUR (.*) +.*','\\1',LINE)))
-                    if curr == 'EUR':
-                        PRICE = float(re.sub('.*> +\xc2\xa3(.*) +.*','\\1',LINE))# \c2\a3 => GBP
-        c.close()
-    #except:
-    #   	print("DE parse fail.")
+    c = httplib.HTTPSConnection(SERVER[curr],'443',timeout=15)
+    c.request('GET','/gp/offer-listing/' + BOOKID + '/')
+    r = c.getresponse()
+    if r.status == 200:
+        f = open('/tmp/data.txt','w')
+        f.write(r.read())
+        f.close()
+         #           if curr == 'EUR':
+         #               PRICE = float(re.sub(',','.',re.sub('.*> +EUR (.*) +.*','\\1',LINE)))
+         #           if curr == 'EUR':
+         #               PRICE = float(re.sub('.*> +\xc2\xa3(.*) +.*','\\1',LINE))# \c2\a3 => GBP
+    c.close()
 
+#parse_offer('EUR')
+
+f = open('/tmp/data.txt','r')
+
+p = lxml.html.HTMLParser()
+t = lxml.html.parse(StringIO.StringIO(f.read()),p)
+
+o = t.xpath("//span[contains(@class,'olpOfferPrice')]")
+for OFFER in o:
+    print "offer: ", OFFER.text
+
+s = t.xpath("//span[contains(@class,'olpShippingPrice')]")
+for SHIPPING in s:
+    print "shipping: ", SHIPPING.text
+
+f.close()
 
