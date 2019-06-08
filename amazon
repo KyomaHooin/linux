@@ -30,37 +30,27 @@ def currency(curr):
     except: pass
     return ''
 
-#print currency('EUR')
-#print currency('GBP')
+def clean_price(curr,val):
+    if curr == 'GBP':
+        return float(re.sub('\xa3','',val.strip()))# Pound char
+    if curr == 'EUR':
+        return float(re.sub(',','.',re.sub('EUR ','',val.strip())))# 'EUR ' + decimal
 
 def parse_offer(curr):
     c = httplib.HTTPSConnection(SERVER[curr],'443',timeout=15)
     c.request('GET','/gp/offer-listing/' + BOOKID + '/')
     r = c.getresponse()
     if r.status == 200:
-        f = open('/tmp/data.txt','w')
-        f.write(r.read())
-        f.close()
-         #           if curr == 'EUR':
-         #               PRICE = float(re.sub(',','.',re.sub('.*> +EUR (.*) +.*','\\1',LINE)))
-         #           if curr == 'EUR':
-         #               PRICE = float(re.sub('.*> +\xc2\xa3(.*) +.*','\\1',LINE))# \c2\a3 => GBP
+        p = lxml.html.HTMLParser()
+        t = lxml.html.parse(StringIO.StringIO(r.read()),p)
+        o = t.xpath("//div[contains(@class,'olpOffer')]")
+        for i in range(1,len(o)):
+            price = o[i].xpath(".//span[contains(@class,'olpOfferPrice')]")
+            shipping = o[i].xpath(".//span[contains(@class,'olpShippingPrice')]")
+            if p: print clean_price(curr,price[0].text)
+            if d: print clean_price(curr,shipping[0].text)
     c.close()
+    return
 
-parse_offer('GBP')
-
-f = open('/tmp/data.txt','r')
-
-p = lxml.html.HTMLParser()
-t = lxml.html.parse(StringIO.StringIO(f.read()),p)
-
-o = t.xpath("//div[contains(@class,'olpOffer')]")
-
-for i in range(1,len(o)):
-    p = o[i].xpath(".//span[contains(@class,'olpOfferPrice')]")
-    d = o[i].xpath(".//span[contains(@class,'olpShippingPrice')]")
-    if p: print "Price: ", p[0].text.strip()
-    if d: print "Delivery: ", d[0].text.strip()
-
-f.close()
+#----------------------------
 
