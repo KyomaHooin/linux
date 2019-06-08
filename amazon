@@ -1,6 +1,8 @@
 #!/usr/bin/python
 #
 # TODO:
+#   -offer root
+#   -<= good condition
 #   -parse offer
 #   -parse shipping
 #   -calculate total
@@ -45,20 +47,20 @@ def parse_offer(curr):
          #               PRICE = float(re.sub('.*> +\xc2\xa3(.*) +.*','\\1',LINE))# \c2\a3 => GBP
     c.close()
 
-#parse_offer('EUR')
+parse_offer('GBP')
 
 f = open('/tmp/data.txt','r')
 
 p = lxml.html.HTMLParser()
 t = lxml.html.parse(StringIO.StringIO(f.read()),p)
 
-o = t.xpath("//span[contains(@class,'olpOfferPrice')]")
-for OFFER in o:
-    print "offer: ", OFFER.text
+o = t.xpath("//div[contains(@class,'olpOffer')]")
 
-s = t.xpath("//span[contains(@class,'olpShippingPrice')]")
-for SHIPPING in s:
-    print "shipping: ", SHIPPING.text
+for i in range(1,len(o)):
+    p = o[i].xpath(".//span[contains(@class,'olpOfferPrice')]")
+    d = o[i].xpath(".//span[contains(@class,'olpShippingPrice')]")
+    if p: print "Price: ", p[0].text.strip()
+    if d: print "Delivery: ", d[0].text.strip()
 
 f.close()
 
