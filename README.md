@@ -6,7 +6,7 @@ Some kuddo shell staff.
 FILE
 <pre>
       acme - ACME certificate renewal with acme_tiny.py.
-    amazon - Check Amazon effers.
+    amazon - Amazon book offer SMS notify.
     backup - Simple configuration backup.
       book - Email SMS notify.
      cisco - Dynamips emulator wrapper.
