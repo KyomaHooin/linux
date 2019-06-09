@@ -57,7 +57,7 @@ def parse_offer(curr,book):
             else: shipping = clean_price(curr,shipping[0].text)
             total = (price + shipping) * get_currency(curr)
             if total <= LIMIT: out.append(total)
-        c.close()
+    c.close()
     return out
 
 def sms_notify(offer,curr,book):
