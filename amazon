@@ -27,10 +27,8 @@ def get_currency(curr):
         r = c.getresponse()
         if r.status == 200:
             for LINE in r.read().split('\n'):
-                if curr in LINE:
-                    value = float(re.sub(',','.',re.sub('.*\|(.*)$','\\1',LINE)))
+                if curr in LINE: return float(re.sub(',','.',re.sub('.*\|(.*)$','\\1',LINE)))
         c.close()
-        return value
     except: return 0
 
 def clean_price(curr,price):
@@ -84,7 +82,6 @@ while 1:
                             sms_notify(format(offer,'.2f'),curr,book)
         except:
             f.write('Program error.\n')
-            pass
     if time.gmtime()[4] % 30 == 1: TOKEN=True
     time.sleep(5)
 
