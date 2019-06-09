@@ -6,7 +6,7 @@
 import StringIO,httplib,lxml.html,smtplib,time,re
 from email.mime.text import MIMEText
 
-BOOK=['1841499897']
+BOOK=['1841499897','B0163DU4C6']
 CURRENCY=['EUR','GBP']
 SERVER={'EUR':'www.amazon.de','GBP':'www.amazon.co.uk'}
 LIMIT=150
@@ -35,44 +35,38 @@ def get_currency(curr):
 
 def clean_price(curr,price):
     try:
-        if curr == 'GBP':
-            return float(re.sub('\xa3','',price.strip()))# Pound char
-        if curr == 'EUR':
-            return float(re.sub(',','.',re.sub('EUR ','',price.strip())))# 'EUR ' + decimal
+        if curr == 'GBP': return float(re.sub('\xa3','',price.strip()))# Pound char
+        if curr == 'EUR': return float(re.sub(',','.',re.sub('EUR ','',price.strip())))# 'EUR ' + decimal
     except: return 0
 
 def parse_offer(curr,book):
     out = []
-    try:
-        c = httplib.HTTPSConnection(SERVER[curr],timeout=10)
-        c.request('GET','/gp/offer-listing/' + book)
-        r = c.getresponse()
-        if r.status == 200:
-            p = lxml.html.HTMLParser()
-            t = lxml.html.parse(StringIO.StringIO(r.read()),p)
-            o = t.xpath("//div[@class='a-row a-spacing-mini olpOffer']")
-            for i in range(0,len(o)):
-                price = o[i].xpath(".//span[contains(@class,'olpOfferPrice')]")
-                shipping = o[i].xpath(".//span[contains(@class,'olpShippingPrice')]")
-                if not price: price = 0
-                else: price = clean_price(curr,price[0].text)
-                if not shipping: shipping = 0
-                else: shipping = clean_price(curr,shipping[0].text)
-                total = (price + shipping) * get_currency(curr)
-                if total <= LIMIT: out.append(total)
+    c = httplib.HTTPSConnection(SERVER[curr],timeout=10)
+    c.request('GET','/gp/offer-listing/' + book)
+    r = c.getresponse()
+    if r.status == 200:
+        p = lxml.html.HTMLParser()
+        t = lxml.html.parse(StringIO.StringIO(r.read()),p)
+        o = t.xpath("//div[@class='a-row a-spacing-mini olpOffer']")
+        for i in range(0,len(o)):
+            price = o[i].xpath(".//span[contains(@class,'olpOfferPrice')]")
+            shipping = o[i].xpath(".//span[contains(@class,'olpShippingPrice')]")
+            if not price: price = 0
+            else: price = clean_price(curr,price[0].text)
+            if not shipping: shipping = 0
+            else: shipping = clean_price(curr,shipping[0].text)
+            total = (price + shipping) * get_currency(curr)
+            if total <= LIMIT: out.append(total)
         c.close()
-    except: print "Parse error."
     return out
 
 def sms_notify(offer,curr,book):
-    try:
-        msg = MIMEText(str(offer) + ' ' + curr + ' ' + book)
-        msg['From'] = OUTUSR
-        msg['To'] = OUTBOX
-        mail = smtplib.SMTP(OUTSRV)
-        mail.sendmail(OUTUSR,OUTBOX,msg.as_string())
-        mail.quit()
-    except: print "Notify error."
+    msg = MIMEText(str(offer) + ' ' + curr + ' ' + book)
+    msg['From'] = OUTUSR
+    msg['To'] = OUTBOX
+    mail = smtplib.SMTP(OUTSRV)
+    mail.sendmail(OUTUSR,OUTBOX,msg.as_string())
+    mail.quit()
 
 #----------------------------
 
