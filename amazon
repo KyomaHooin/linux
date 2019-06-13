@@ -71,7 +71,7 @@ def sms_notify(offer,curr,book):
 f = open('/var/log/book.log','a')
 
 while 1:
-    if time.gmtime()[4] % 30 == 0 and TOKEN:
+    if time.gmtime()[4] % 20 == 0 and TOKEN:
         TOKEN = False
         try:
             for book in BOOK:
@@ -82,7 +82,7 @@ while 1:
                             sms_notify(format(offer,'.2f'),curr,book)
                         f.write('Hit: ' + str(offer) + ' ' + curr + ' ' + book + '\n')
         except: f.write('Program error.\n')
-    if time.gmtime()[4] % 30 == 1: TOKEN=True
+    if time.gmtime()[4] % 20 == 1: TOKEN=True
     time.sleep(5)
 
 f.close()
