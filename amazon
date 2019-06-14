@@ -6,7 +6,7 @@
 import StringIO,httplib,lxml.html,smtplib,time,re
 from email.mime.text import MIMEText
 
-BOOK=['1841499897','B0163DU4C6']
+BOOK=['1841499897','B0163DU4C6','1841499889']
 CURRENCY=['EUR','GBP']
 SERVER={'EUR':'www.amazon.de','GBP':'www.amazon.co.uk'}
 LIMIT=150
@@ -68,7 +68,7 @@ def sms_notify(offer,curr,book):
 
 #----------------------------
 
-f = open('/var/log/book.log','a')
+f = open('/var/log/book.log','a',0)# no buffering damnit!
 
 while 1:
     if time.gmtime()[4] % 20 == 0 and TOKEN:
