@@ -10,7 +10,7 @@ FIRST COMMIT
 git init
 git add .
 git commit -m "First commit." <file>
-git remote del origin
+git remote remove origin
 git remote add origin ssh://git@github.com:/KyomaHooin/repo
 git push origin master
 
