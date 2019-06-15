@@ -80,8 +80,8 @@ while 1:
                         if not offer in HISTORY:
                             HISTORY.append(offer)
                             sms_notify(format(offer,'.2f'),curr,book)
-                        f.write('Hit: ' + str(offer) + ' ' + curr + ' ' + book + '\n')
-        except: f.write('Program error.\n')
+                            f.write(time.strftime('%d.%m.%y %H:%M:%S') + ' Hit: ' + str(offer) + ' ' + curr + ' ' + book + '\n')
+        except: f.write(time.strftime('$d.%m.$y %H:%M:%S') + ' Program error.\n')
     if time.gmtime()[4] % 20 == 1: TOKEN=True
     time.sleep(5)
 
