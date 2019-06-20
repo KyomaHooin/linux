@@ -40,7 +40,6 @@ def clean_price(curr,price):
 def parse_offer(curr,book):
     out = {}
     c = httplib.HTTPSConnection(SERVER[curr],timeout=10)
-    headers = {'User-agent': AGENT}
     c.request('GET','/gp/offer-listing/' + book)
     r = c.getresponse()
     if r.status == 200:
