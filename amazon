@@ -76,7 +76,7 @@ def sms_notify(offer,vendor,curr,book):
 log = open('/var/log/book.log','a',0)# no buffering damnit!
 
 while 1:
-    if time.gmtime()[4]  == '00' and TOKEN:
+    if time.gmtime()[4] == '00' and TOKEN:
     TOKEN = False
     try:
         for book in BOOK:
@@ -97,7 +97,7 @@ while 1:
                         )
             time.sleep(5)
     except: log.write(time.strftime('%d.%m.%y %H:%M:%S') + ' Program error.\n')
-    if time.gmtime()[4]  == '01': TOKEN=True
+    if time.gmtime()[4] == '01': TOKEN=True
     time.sleep(5)
 
 log.close()
