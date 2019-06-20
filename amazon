@@ -38,8 +38,9 @@ def clean_price(curr,price):
     except: return 0
 
 def parse_offer(curr,book):
-    out = []
+    out = {}
     c = httplib.HTTPSConnection(SERVER[curr],timeout=10)
+    headers = {'User-agent': AGENT}
     c.request('GET','/gp/offer-listing/' + book)
     r = c.getresponse()
     if r.status == 200:
@@ -49,17 +50,21 @@ def parse_offer(curr,book):
         for i in range(0,len(o)):
             price = o[i].xpath(".//span[contains(@class,'olpOfferPrice')]")
             shipping = o[i].xpath(".//span[contains(@class,'olpShippingPrice')]")
+            vendor = o[i].xpath(".//h3[contains(@class,'olpSellerName')]//a")
+            if not vendor: vendor = ''
+            else: vendor = vendor[0].text
             if not price: price = 0
             else: price = clean_price(curr,price[0].text)
             if not shipping: shipping = 0
             else: shipping = clean_price(curr,shipping[0].text)
             total = (price + shipping) * get_currency(curr)
-            if total <= LIMIT: out.append(total)
+            if total <= LIMIT: out[price]=vendor
+    else: log.write(r)
     c.close()
     return out
 
-def sms_notify(offer,curr,book):
-    msg = MIMEText(str(offer) + ' ' + curr + ' ' + book)
+def sms_notify(offer,vendor,curr,book):
+    msg = MIMEText(str(offer) + ' ' + vendor + ' ' + curr + ' ' + book)
     msg['From'] = OUTUSR
     msg['To'] = OUTBOX
     mail = smtplib.SMTP(OUTSRV)
@@ -68,22 +73,32 @@ def sms_notify(offer,curr,book):
 
 #----------------------------
 
-f = open('/var/log/book.log','a',0)# no buffering damnit!
+log = open('/var/log/book.log','a',0)# no buffering damnit!
 
 while 1:
-    if time.gmtime()[4] % 20 == 0 and TOKEN:
-        TOKEN = False
-        try:
-            for book in BOOK:
-                for curr in CURRENCY:
-                    for offer in parse_offer(curr,book):
-                        if not offer in HISTORY:
-                            HISTORY.append(offer)
-                            sms_notify(format(offer,'.2f'),curr,book)
-                            f.write(time.strftime('%d.%m.%y %H:%M:%S') + ' Hit: ' + str(offer) + ' ' + curr + ' ' + book + '\n')
-        except: f.write(time.strftime('$d.%m.$y %H:%M:%S') + ' Program error.\n')
-    if time.gmtime()[4] % 20 == 1: TOKEN=True
+    if time.gmtime()[4]  == '00' and TOKEN:
+    TOKEN = False
+    try:
+        for book in BOOK:
+            for curr in CURRENCY:
+                offers = parse_offer(curr,book)
+                for offer in offers:
+                    if not offer in HISTORY:
+                        HISTORY.append(offer)
+                        sms_notify(offer,offers[offer],curr,book)
+                        log.write(
+                            time.strftime('%d.%m.%y %H:%M') +
+                            ' Hit: ' +
+                            str(offer) +
+                            ' ' + offers[offer] +
+                            ' ' + curr +
+                            ' ' + book +
+                            '\n'
+                        )
+            time.sleep(5)
+    except: log.write(time.strftime('%d.%m.%y %H:%M:%S') + ' Program error.\n')
+    if time.gmtime()[4]  == '01': TOKEN=True
     time.sleep(5)
 
-f.close()
+log.close()
 
