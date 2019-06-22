@@ -29,7 +29,9 @@ def get_currency(curr):
             for LINE in r.read().split('\n'):
                 if curr in LINE: return float(re.sub(',','.',re.sub('.*\|(.*)$','\\1',LINE)))
         c.close()
-    except: return 0
+    except:
+        if curr == "GPB": return 28.7
+        if curr == "EUR": return 25.6
 
 def clean_price(curr,price):
     try:
