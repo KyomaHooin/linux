@@ -97,7 +97,7 @@ while 1:
                                 '\n'
                             )
                     time.sleep(5)
-        except: log.write(time.strftime('%d.%m.%y %H:%M:%S') + ' Program error.\n')
+        except: log.write(time.strftime('%d.%m.%y %H:%M') + ' Connection error.\n')
     if time.gmtime()[4] == 1: TOKEN=True
     time.sleep(5)
 
