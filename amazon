@@ -2,6 +2,10 @@
 #
 # Amazon book offer SMS notify. 
 #
+# TODO:
+# -quality
+# -international shipping
+#
 
 import StringIO,httplib,lxml.html,smtplib,time,re
 from email.mime.text import MIMEText
