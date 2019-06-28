@@ -2,10 +2,6 @@
 #
 # Amazon book offer SMS notify. 
 #
-# TODO:
-# -quality
-# -international shipping
-#
 
 import StringIO,httplib,lxml.html,smtplib,time,re
 from email.mime.text import MIMEText
@@ -13,7 +9,7 @@ from email.mime.text import MIMEText
 BOOK=['1841499897','B0163DU4C6','1841499889']
 CURRENCY=['EUR','GBP']
 SERVER={'EUR':'www.amazon.de','GBP':'www.amazon.co.uk'}
-LIMIT=150
+LIMIT=160
 
 OUTUSR='root@root.cz'
 OUTSRV='smtps21.cz.o2.com'
@@ -43,6 +39,22 @@ def clean_price(curr,price):
         if curr == 'EUR': return float(re.sub(',','.',re.sub('EUR ','',price.strip())))# 'EUR ' + decimal
     except: return 0
 
+def get_quality(q):
+    if q:
+        if q[0].text:
+            for  quality in ['Very Good','Like New','Sehr gut','Wie neu']:
+                if quality in q[0].text: return 1
+    return 0
+
+def get_delivery(d):
+    if d:
+        options = d[0].iter('span')
+        for o in options:
+            if o.text:
+                if 'Dispatched from' in o.text: return 1
+                if 'Versand aus' in o.text: return 1
+    return 0
+
 def parse_offer(curr,book):
     out = {}
     c = httplib.HTTPSConnection(SERVER[curr],timeout=10)
@@ -56,14 +68,17 @@ def parse_offer(curr,book):
             price = o[i].xpath(".//span[contains(@class,'olpOfferPrice')]")
             shipping = o[i].xpath(".//span[contains(@class,'olpShippingPrice')]")
             vendor = o[i].xpath(".//h3[contains(@class,'olpSellerName')]//a")
-            if not vendor: vendor = ''
-            else: vendor = vendor[0].text
-            if not price: price = 0
-            else: price = clean_price(curr,price[0].text)
-            if not shipping: shipping = 0
-            else: shipping = clean_price(curr,shipping[0].text)
-            total = (price + shipping) * get_currency(curr)
-            if total <= LIMIT: out[price]=vendor
+            quality = o[i].xpath(".//span[contains(@class,'olpCondition')]")
+            delivery = o[i].xpath(".//div[contains(@class,'olpDeliveryColumn')]")
+            if get_quality(quality) and get_delivery(delivery):
+                if not vendor: vendor = ''
+                else: vendor = vendor[0].text
+                if not price: price = 0
+                else: price = clean_price(curr,price[0].text)
+                if not shipping: shipping = 0
+                else: shipping = clean_price(curr,shipping[0].text)
+                total = (price + shipping) * get_currency(curr)
+                if total <= LIMIT: out[price]=vendor
     else: log.write(r)
     c.close()
     return out
