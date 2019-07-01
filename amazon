@@ -6,9 +6,9 @@
 import StringIO,httplib,lxml.html,smtplib,time,re
 from email.mime.text import MIMEText
 
-BOOK=['0812555244','B007YTPTTC']
+BOOK=['0812555244','B007YTPTTC','0812577698','B004H0TS0C']
 CURRENCY=['EUR','GBP']
-CONDITION=['Good','Gut','Very Good','Like New','Sehr gut','Wie neu']
+CONDITION=['Good','Gut','Very Good','Sehr gut','Like New','Wie neu']
 SERVER={'EUR':'www.amazon.de','GBP':'www.amazon.co.uk'}
 LIMIT=160
 
