@@ -6,7 +6,7 @@
 	--acme-dir /var/www/.well-known/acme-challenge/ \
 	> /tmp/server.crt || exit 1
 
-/usr/bin/wget -O - https://letsencrypt.org/certs/lets-encrypt-x3-cross-signed.pem > /tmp/X3.pem
+/usr/bin/wget -O - https://letsencrypt.org/certs/letsencryptauthorityx3.pem > /tmp/X3.pem
 
 [ -s /tmp/server.crt ] && cat /tmp/server.crt > /etc/apache2/acme/server.crt
 [ -s /tmp/X3.pem ] && cat /tmp/X3.pem > /etc/apache2/acme/X3.pem
