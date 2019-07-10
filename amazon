@@ -6,7 +6,7 @@
 import StringIO,httplib,lxml.html,smtplib,time,re
 from email.mime.text import MIMEText
 
-BOOK=['0812555244','B007YTPTTC','0575088575']
+BOOK=['0812555244','B007YTPTTC','0575088575','1621052265']#Quantum, Air, Starr
 CURRENCY=['EUR','GBP']
 CONDITION=['Good','Gut','Very Good','Sehr gut','Like New','Wie neu']
 SERVER={'EUR':'www.amazon.de','GBP':'www.amazon.co.uk'}
@@ -122,3 +122,4 @@ while 1:
 
 log.close()
 
+1621052265
