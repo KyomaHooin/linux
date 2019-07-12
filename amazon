@@ -93,7 +93,7 @@ def sms_notify(offer,vendor,curr,book):
 
 #----------------------------
 
-log = open('/var/log/book.log','a',0)# no buffering damnit!
+log = open('/var/log/amazon.log','a',0)# no buffering damnit!
 
 while 1:
     if time.gmtime()[4] == 0 and TOKEN:

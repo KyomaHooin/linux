@@ -22,7 +22,7 @@ NOTIFY=True
 f = open('/var/log/book.log','a')
 
 while 1:
-    if time.gmtime()[4] % 10 == 0 and TOKEN:
+    if time.gmtime()[4] == 30 and TOKEN:
         TOKEN = False
         try:
             s = poplib.POP3(INSRV,timeout=15)
@@ -39,7 +39,7 @@ while 1:
         except:
             f.write('Get/send error.\n')
             pass
-    if time.gmtime()[4] % 10 == 1: TOKEN=True
+    if time.gmtime()[4] == 31: TOKEN=True
     time.sleep(5)
 
 f.close()
