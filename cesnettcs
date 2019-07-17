@@ -10,65 +10,73 @@
 # update-ca-certificates 
 #
 
-import httplib,json,time,ssl
+import httplib,urllib,json,time,ssl
 
 SERVER_CRT='/root/server.crt'
 SERVER_KEY='/root/server.key'
-SERVER_REQ='' #base64 pkcs10 PEM
-
-TCS_SERVER='tcs.cesnet.cz'
-TCS_REQUEST_URL='/api/v2/certificate/request'
-TCS_STATUS_URL='/api/v2/certificate/status/'
 
 HEADER={'Content-type':'application/json'}
 
-REQUEST={
+TCS_SERVER='tcs.cesnet.cz'
+TCS_STATUS_URL='/api/v2/certificate/status/'
+TCS_REQUEST_URL='/api/v2/certificate/request'
+TCS_REQUEST={
     'certificateRequest': SERVER_REQ,
     'certificateType': 'ev',
     'certificateValidity': 2,
-    'notificationMail': [
-        'admin@company.cz',
-    ],
+    'notificationMail': 'admin@company.cz',
     'requesterPhone': '+420314159265'
 }
+TCS_REQUEST_ID=''
+TCS_CERT=''
 
 #--------------------------
 
-#Setup SSL client certificate (CA => /etc/ssl/certs/) 
+def update_cert(cert):
+    try:
+        crt = open(SERVER_CRT,'r+')
+        crt_backup = open(SERVER_CRT + '.back','w')
+        crt_backup.write(crt.read())
+        crt_backup.close()
+        crt.seek(0)
+        crt.write(cert)
+        crt.truncate()
+        crt.close()
+    except:
+        print "Cert file update error."
 
 context = ssl.SSLContext(ssl.PROTOCOL_TLS)
-context.load_cert_chain('/root/server.pem','/root/server/key')
+#context.load_cert_chain('/root/server.pem','/root/server/key')
 
-#Reqest certificate
+try:
+    c = httplib.HTTPSConnection(TCS_SERVER,timeout=10)
+    c.request('POST',TCS_REQUEST_URL,urllib.urlencode(TCS_REQUEST),HEADER)
+    r = c.getresponse()
+    print r.read()
+    if r.status == 201:
+        data = json.load(r.read())  
+        if data['status'] == 'ok':
+            TCS_REQUEST_ID = data['id']
+        if data['status'] == 'error':
+            print "error: ", data['message']
+except:
+    print "Reqest error."
 
-c = httplib.HTTTPSConnection(TCS_SERVER,timeout=10)
-c.request('POST',TSC_REQUEST_URL,HEADER)
-r = c.getresponse()
-if r.status == 201:
-    data = json.load(r.read())  
-    if data['status'] == 'ok'
-        ID = data['id']
-    if data['status'] == 'error'
-        print "error: ", data['message']
-
-#Loop request status
-
-while 1:
-    if time.gmtime()[4] % 5  == 0:
-        #Loop request status
-        c= httplib.HTTTPSConnection(TCS_SERVER,timeout=10)
-        c.request('GET',TCS_STATUS_URL + ID,HEADER)
-        r = c.getresponse()
-        if r.status == 200:
-            data = json.load(r.read())  
-            if data['status'] in ('added','accepted'): pass
-            if data['status'] in ('refused','revoked','error'):
-                    print "error: ", data['message']
-            if data['status'] == 'issued':
-                    cert = data['certificate']
-                    print cert
-
-# backup/write cert 
-
-# reload services
+if TCS_REQUEST_ID:
+    while 1:
+        try:
+            c = httplib.HTTPSConnection(TCS_SERVER,timeout=10)
+            c.request('GET',TCS_STATUS_URL + TCS_REQUEST_ID,HEADER)
+            r = c.getresponse()
+            if r.status == 200:
+                data = json.load(r.read())  
+                if data['status'] in ('added','accepted'): pass
+                if data['status'] in ('refused','revoked','error'):
+                   print "error: ", data['message']
+                if data['status'] == 'issued':
+                    update_cert(data['certificate'])
+                    break
+        except:
+                print "Response error."
+        time.sleep(60)
 
