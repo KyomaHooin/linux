@@ -15,20 +15,52 @@ import httplib,json,ssl
 ID='31415265'
 SERVER_CRT='/root/server.crt'
 SERVER_KEY='/root/server.key'
+SERVER_REQ='' #base64 pkcs10 PEM
 
-REQUEST_URL='https://tcs.cesnet.cz/api/v2/certificate/request'
-STATUS_URL='https://tcs.cesnet.cz/api/v2/certificate/status/' + ID
+TCS_SERVER='tcs.cesnet.cz'
+TCS_REQUEST_URL='/api/v2/certificate/request'
+TCS_STATUS_URL='/api/v2/certificate/status/' + ID
 
 HEADER={'Content-type':'application/json'}
+
+REQUEST={
+    'certificateRequest': SERVER_REQ,
+    'certificateType': 'ev',
+    'certificateValidity': 2,
+    'notificationMail': [
+        'admin@company.cz',
+    ],
+    'requesterPhone': '+420314159265'
+}
 
 #--------------------------
 
 #Setup SSL client certificate (CA => /etc/ssl/certs/) 
+
 context = ssl.SSLContext(ssl.PROTOCOL_TLS)
 context.load_cert_chain('/root/server.pem','/root/server/key')
 
-# reqest cert
-# loop request status
+#Reqest certificate
+
+c = httplib.HTTTPSConnection(TCS_SERVER,timeout=10)
+c.request('POST',TSC_REQUEST_URL,HEADER)
+r = c.getresponse()
+#if r.status == 201:
+# check 'status','code','message'
+
+#loop request status
+
+c= httplib.HTTTPSConnection(TCS_SERVER,timeout=10)
+c.request('GET',TCS_STATUS_URL,HEADER)
+r = c.getresponse()
+#if r.status == 400:
+# check 'status','cert','message'
+
 # write new cert
+
+# get cert from response
+# backup/write cert 
+
 # reload services
+
 
