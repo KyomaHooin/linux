@@ -10,16 +10,15 @@
 # update-ca-certificates 
 #
 
-import httplib,json,ssl
+import httplib,json,time,ssl
 
-ID='31415265'
 SERVER_CRT='/root/server.crt'
 SERVER_KEY='/root/server.key'
 SERVER_REQ='' #base64 pkcs10 PEM
 
 TCS_SERVER='tcs.cesnet.cz'
 TCS_REQUEST_URL='/api/v2/certificate/request'
-TCS_STATUS_URL='/api/v2/certificate/status/' + ID
+TCS_STATUS_URL='/api/v2/certificate/status/'
 
 HEADER={'Content-type':'application/json'}
 
@@ -45,22 +44,31 @@ context.load_cert_chain('/root/server.pem','/root/server/key')
 c = httplib.HTTTPSConnection(TCS_SERVER,timeout=10)
 c.request('POST',TSC_REQUEST_URL,HEADER)
 r = c.getresponse()
-#if r.status == 201:
-# check 'status','code','message'
+if r.status == 201:
+    data = json.load(r.read())  
+    if data['status'] == 'ok'
+        ID = data['id']
+    if data['status'] == 'error'
+        print "error: ", data['message']
 
-#loop request status
+#Loop request status
 
-c= httplib.HTTTPSConnection(TCS_SERVER,timeout=10)
-c.request('GET',TCS_STATUS_URL,HEADER)
-r = c.getresponse()
-#if r.status == 400:
-# check 'status','cert','message'
+while 1:
+    if time.gmtime()[4] % 5  == 0:
+        #Loop request status
+        c= httplib.HTTTPSConnection(TCS_SERVER,timeout=10)
+        c.request('GET',TCS_STATUS_URL + ID,HEADER)
+        r = c.getresponse()
+        if r.status == 200:
+            data = json.load(r.read())  
+            if data['status'] in ('added','accepted'): pass
+            if data['status'] in ('refused','revoked','error'):
+                    print "error: ", data['message']
+            if data['status'] == 'issued':
+                    cert = data['certificate']
+                    print cert
 
-# write new cert
-
-# get cert from response
 # backup/write cert 
 
 # reload services
-
 
