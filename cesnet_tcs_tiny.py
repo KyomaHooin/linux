@@ -56,8 +56,7 @@ if CLIENT_CRT and CLIENT_KEY and CSR:
     try:
         context = ssl.SSLContext(ssl.PROTOCOL_TLS)
         context.load_cert_chain(CLIENT_CRT,CLIENT_KEY)
-    except:
-        log.write("error: SSL context.")
+    except: log.write("error: SSL context.")
 
     try:
         c = httplib.HTTPSConnection(TCS_SERVER)
@@ -68,8 +67,7 @@ if CLIENT_CRT and CLIENT_KEY and CSR:
             if data['status'] == 'ok': TCS_REQUEST_ID = data['id']
             if data['status'] == 'error':
                 log.write("error: " + data['message'])
-    except:
-        log.write("error: API reqest.")
+    except: log.write("error: API reqest.")
 
 if TCS_REQUEST_ID:
     while 1:
@@ -85,8 +83,7 @@ if TCS_REQUEST_ID:
                 if data['status'] == 'issued':
                     print data['certificate']
                     break
-        except:
-            log.write("error: TCS API response.")
+        except: log.write("error: TCS API response.")
         time.sleep(60)
 
 log.close()
