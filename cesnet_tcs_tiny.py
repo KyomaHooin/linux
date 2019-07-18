@@ -18,8 +18,6 @@ TCS_STATUS_URL='/api/v2/certificate/status'
 
 LOG='cesnet_tcs_tiny.log'
 
-#---------------------------
-
 CLIENT_CRT,CLIENT_KEY,CSR = '','',''
 
 parser = argparse.ArgumentParser(description="Cesnet TCS API tiny client.")
