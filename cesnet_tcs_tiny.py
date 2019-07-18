@@ -18,6 +18,8 @@ TCS_STATUS_URL='/api/v2/certificate/status'
 
 LOG='cesnet_tcs_tiny.log'
 
+#---------------------------
+
 CLIENT_CRT,CLIENT_KEY,CSR = '','',''
 
 parser = argparse.ArgumentParser(description="Cesnet TCS API tiny client.")
@@ -40,20 +42,23 @@ try:
 except: log.write("error: Read CSR request.")
 
 TCS_REQUEST_HEADER={'Content-type':'application/json'}
-TCS_REQUEST={
-    'certificateRequest': CSR,
-    'certificateType': 'ov',
-    'certificateValidity': 1,
-    'notificationMail': 'admin@company.cz',
-    'requesterPhone': '+420314159265'
-}
-
 TCS_REQUEST_ID=''
 
-context = ssl.SSLContext(ssl.PROTOCOL_TLS)
-context.load_cert_chain(CLIENT_CRT,CLIENT_KEY)
-
 if CLIENT_CRT and CLIENT_KEY and CSR:
+    TCS_REQUEST={
+        'certificateRequest': CSR,
+        'certificateType': 'ov',
+        'certificateValidity': 1,
+        'notificationMail': 'admin@company.cz',
+        'requesterPhone': '+420314159265'
+    }
+
+    try:
+        context = ssl.SSLContext(ssl.PROTOCOL_TLS)
+        context.load_cert_chain(CLIENT_CRT,CLIENT_KEY)
+    except:
+        log.write("error: SSL context.")
+
     try:
         c = httplib.HTTPSConnection(TCS_SERVER)
         c.request('POST',TCS_REQUEST_URL,urllib.urlencode(TCS_REQUEST),HEADER)
