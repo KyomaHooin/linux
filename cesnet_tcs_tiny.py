@@ -33,13 +33,13 @@ log = open(LOG,'a',0)
 
 try:
     with open(args.client-crt,'r') as f: CLIENT_CRT = f.read()
-except: log.write("error: Read client certificate.")
+except: log.write("error: Read client certificate.\n")
 try:
     with open(args.client-key,'r') as f: CLIENT_KEY = f.read()
-except: log.write("error: Read client key.")
+except: log.write("error: Read client key.\n")
 try:
     with open(args.csr,'r') as f: CSR = f.read()
-except: log.write("error: Read CSR request.")
+except: log.write("error: Read CSR request.\n")
 
 TCS_REQUEST_HEADER={'Content-type':'application/json'}
 TCS_REQUEST_ID=''
@@ -56,7 +56,7 @@ if CLIENT_CRT and CLIENT_KEY and CSR:
     try:
         context = ssl.SSLContext(ssl.PROTOCOL_TLS)
         context.load_cert_chain(CLIENT_CRT,CLIENT_KEY)
-    except: log.write("error: SSL context.")
+    except: log.write("error: SSL context.\n")
 
     try:
         c = httplib.HTTPSConnection(TCS_SERVER)
@@ -66,8 +66,8 @@ if CLIENT_CRT and CLIENT_KEY and CSR:
             data = json.load(r.read())  
             if data['status'] == 'ok': TCS_REQUEST_ID = data['id']
             if data['status'] == 'error':
-                log.write("error: " + data['message'])
-    except: log.write("error: API reqest.")
+                log.write("error: " + data['message'] + '\n')
+    except: log.write("error: API reqest.\n")
 
 if TCS_REQUEST_ID:
     while 1:
@@ -78,12 +78,12 @@ if TCS_REQUEST_ID:
             if r.status == 200:
                 data = json.load(r.read())  
                 if data['status'] in ('refused','revoked','error'):
-                    log.write("error: " + data['message'])
+                    log.write("error: " + data['message'] + '\n')
                     break
                 if data['status'] == 'issued':
                     print data['certificate']
                     break
-        except: log.write("error: TCS API response.")
+        except: log.write("error: TCS API response.\n")
         time.sleep(60)
 
 log.close()
