@@ -60,12 +60,11 @@ if CLIENT_CRT and CLIENT_KEY and CSR:
         c = httplib.HTTPSConnection(TCS_SERVER)
         c.request('POST',TCS_REQUEST_URL,urllib.urlencode(TCS_REQUEST),HEADER)
         r = c.getresponse()
-        if r.status == 201:
-            data = json.load(r.read())  
-            if data['status'] == 'ok': TCS_REQUEST_ID = data['id']
-            if data['status'] == 'error':
-                log.write("error: " + data['message'] + '\n')
-    except: log.write("error: API reqest.\n")
+        data = json.load(r.read())  
+        if data['status'] == 'ok': TCS_REQUEST_ID = data['id']
+        if data['status'] == 'error':
+            log.write("error: " + data['message'] + '\n')
+    except: log.write("error: TCS API reqest.\n")
 
 if TCS_REQUEST_ID:
     while 1:
@@ -73,14 +72,13 @@ if TCS_REQUEST_ID:
             c = httplib.HTTPSConnection(TCS_SERVER)
             c.request('GET',TCS_STATUS_URL + '/' + TCS_REQUEST_ID)
             r = c.getresponse()
-            if r.status == 200:
-                data = json.load(r.read())  
-                if data['status'] in ('refused','revoked','error'):
-                    log.write("error: " + data['message'] + '\n')
-                    break
-                if data['status'] == 'issued':
-                    print data['certificate']
-                    break
+            data = json.load(r.read())  
+            if data['status'] in ('refused','revoked','error'):
+                log.write("error: " + data['message'] + '\n')
+                break
+            if data['status'] == 'issued':
+                print data['certificate']
+                break
         except: log.write("error: TCS API response.\n")
         time.sleep(60)
 
