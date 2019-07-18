@@ -3,12 +3,12 @@
 DOMAIN='server.cz'
 SERVER_KEY='server.key'
 
-CSR=$(openssl req -new -sha256 -key $SERVER_KEY -subj /CN=$DOMAIN)
+CSR=$(openssl req -new -sha256 -key $SERVER_KEY -subj /CN=$DOMAIN > /tmp/server.csr 2>/dev/null)
 
-/usr/bin/python /root/tcs/cesnet_tcs_tiny.py \
+[ -s /tmp/server.csr ] && /usr/bin/python /root/tcs/cesnet_tcs_tiny.py \
 	--client-crt /root/tcs/client.crt \
-	--client-key /root/tcs/cleint.key \
-	--csr /root/tcs/server.csr \
+	--client-key /root/tcs/client.key \
+	--csr /tmp/server.csr \
 	> /tmp/server.crt || exit 1
 
 [ -s /tmp/server.crt ] && cat /tmp/server.crt > /etc/apache2/tcs/server.crt
