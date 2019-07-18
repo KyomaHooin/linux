@@ -10,7 +10,7 @@
 # update-ca-certificates
 #
 
-import argparse,httplib,urllib,json,time,ssl,sys
+import argparse,httplib,urllib,json,time,ssl
 
 TCS_SERVER='tcs.cesnet.cz'
 TCS_REQUEST_URL='/api/v2/certificate/request'
