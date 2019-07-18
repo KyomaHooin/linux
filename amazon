@@ -6,11 +6,11 @@
 import StringIO,httplib,lxml.html,smtplib,time,re
 from email.mime.text import MIMEText
 
-BOOK=['0812555244','B007YTPTTC','0575088575','1621052265']#Quantum, Air, Starr
+BOOK=['0575088575','1621052265','031286034X']# Air,Starr,Fall,Quantum('0812555244','B007YTPTTC')
 CURRENCY=['EUR','GBP']
 CONDITION=['Good','Gut','Very Good','Sehr gut','Like New','Wie neu']
 SERVER={'EUR':'www.amazon.de','GBP':'www.amazon.co.uk'}
-LIMIT=160
+LIMIT=170
 
 OUTUSR='root@root.cz'
 OUTSRV='smtps21.cz.o2.com'
