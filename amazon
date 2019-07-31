@@ -12,7 +12,7 @@ CONDITION=['Good','Gut','Very Good','Sehr gut','Like New','Wie neu']
 SERVER={'EUR':'www.amazon.de','GBP':'www.amazon.co.uk'}
 LIMIT=170
 
-OUTUSR='root@root.cz'
+OUTUSR='io@io.cz'
 OUTSRV='smtps21.cz.o2.com'
 OUTBOX='+420xxx@sms.cz.o2.com'
 

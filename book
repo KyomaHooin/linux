@@ -6,7 +6,7 @@ from email.mime.text import MIMEText
 INSRV='pop3.seznam.cz'
 INBOX='xxx@email.cz'
 INPASS='xxx'
-OUTUSR='root@root.cz'
+OUTUSR='io@io.cz'
 OUTSRV='smtps21.cz.o2.com'
 OUTBOX='+420xxx@sms.cz.o2.com'
 
