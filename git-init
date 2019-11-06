@@ -1,0 +1,12 @@
+#!/bin/bash
+#
+# git-init repo email
+#
+
+git clone https://github.com/KyomaHooin/$1
+cd $1
+git config --global user.name "KyomaHooin"
+git config --global user.email "$2"
+git remote remove origin
+git remote add origin ssh://git@github.com:/KyomaHooin/$1
+
