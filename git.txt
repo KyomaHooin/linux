@@ -40,3 +40,11 @@ LIST CONFIG
 
 git config -l
 
+MERGE FORK PULL
+
+git checkout -b user-branch master
+git pull https://github.com/user/fork.git branch
+git checkout master
+git merge --no-ff user-branch
+git push origin master
+
