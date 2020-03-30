@@ -1,0 +1,44 @@
+#!/usr/bin/python
+#
+# Goodreads Analyzer 1.0
+#
+# apt-get install python-requests python-matplotlib
+#
+# https://www.goodreads.com/book/show/6088007
+# https://www.goodreads.com/shelf/show/cyberpunk?page=1
+
+import sqlite3,requests,sys
+
+
+CYBER='https://www.goodreads.com/shelf/show/cyberpunk' # page 1 - 25 (1250)
+#SF='https://www.goodreads.com/shelf/show/science-fiction'# page 1 - 25 (1250)
+SF=https://www.goodreads.com/list/show/19341.Best_Science_Fiction# page 1 - 29 (2827)
+
+FOX='/home/user/.mozilla/firefox/2wfpvx7b.default/cookies.sqlite'
+
+COOKIES={}
+
+print("Goodreads 1.0")
+
+# LOGIN
+# https://googdread.com ( login + remember login)
+
+conn = sqlite3.connect(FOX)
+cur = conn.cursor()
+cur.execute("SELECT name,value FROM moz_cookies WHERE host = 'www.goodreads.com'")
+rows = cur.fetchall()
+for name,value in rows: COOKIES[name] = value
+
+# HARVEST
+
+#for i = 1 to 25
+#print(CYBER + '?page=' + i)
+
+#ess = requests.get(, cookies=cookies)
+
+
+
+# PLOT
+
+# FILTER
+
