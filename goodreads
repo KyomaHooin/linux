@@ -142,13 +142,10 @@ for BOOK in DATASET:
 		markersize = SIZE		
 	)
 
-# plot desired lines..
-#plt.plot(
-#	numpy.array(set1),
-#	intercept + slope*numpy.array(set1),
-#	'black',
-#	linewidth=1.5
-#)
+# average rating average
+plt.axhline(y=mean(float(DATASET[book]['avg']) for book in DATASET]), linewidth=4, color='k')
+# average rating count
+plt.axvline(x=mean([int(DATASET[book]['ratings'].replace(','.')) for book in DATASET]), linewidth=4, color='k')
 
 plt.xlabel('Number of ratings', fontsize=13)
 plt.ylabel('Average Rating', fontsize=13)
