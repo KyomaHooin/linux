@@ -13,8 +13,6 @@
 import sqlite3,requests,StringIO,lxml.html,numpy,time,sys,re
 import matplotlib.pyplot as plt
 
-#--------------------------------------
-
 GOOD='https://www.goodreads.com'
 SHELF = GOOD + '/shelf/show/cyberpunk'
 LAST_PAGE = 1# 25
@@ -143,9 +141,9 @@ for BOOK in DATASET:
 	)
 
 # average rating average
-plt.axhline(y=mean(float(DATASET[book]['avg']) for book in DATASET]), linewidth=4, color='k')
+plt.axhline(y=sum([float(DATASET[book]['avg']) for book in DATASET]) / len(DATASET), linewidth=2, color='k')
 # average rating count
-plt.axvline(x=mean([int(DATASET[book]['ratings'].replace(','.')) for book in DATASET]), linewidth=4, color='k')
+plt.axvline(x=sum([int(DATASET[book]['ratings'].replace(',','')) for book in DATASET]) / len(DATASET), linewidth=2, color='k')
 
 plt.xlabel('Number of ratings', fontsize=13)
 plt.ylabel('Average Rating', fontsize=13)
