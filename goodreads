@@ -9,12 +9,21 @@
 # https://www.goodreads.com/shelf/show/science-fiction?page=1 - 25 (1250)
 # https://www.goodreads.com/list/show/19341.Best_Science_Fiction?page=1 - 29 (2827)
 #
+# TODO:
+#
+#	-pages
+#	-slope
+#	-plot
+#
 
 import sqlite3,requests,StringIO,lxml.html,time,sys,re
+import matplotlib as plt
+
+#--------------------------------------
 
 GOOD='https://www.goodreads.com'
 SHELF = GOOD + '/shelf/show/cyberpunk'
-
+LAST_PAGE = 25
 FOX = '/home/user/.mozilla/firefox/2wfpvx7b.default/cookies.sqlite'
 
 #--------------------------------------
@@ -26,8 +35,6 @@ print('Goodreads Analyzer 1.0\n')
 # https://goodreads.com -> Remember login -> Login -> Quit)
 
 COOKIES={}
-
-print('Borowing cookies ...')
 
 try:
 	conn = sqlite3.connect(FOX)
@@ -41,11 +48,12 @@ except:
 
 # HARVEST & PARSE
 
-print('Harwesting data  ...\n\n(this may take a while)\n')
+print('Harvesting data .. (this may take a while)')
 
 DATASET = {}
 
-for i in range(1, 3):#26
+for i in range(1, LAST_PAGE + 1):
+	print('Page: ' + str(i))
 	req = requests.get(SHELF + '?page=' + str(i), cookies=COOKIES)
 	if req.status_code == 200:
 		p = lxml.html.HTMLParser()
@@ -85,21 +93,20 @@ for i in range(1, 3):#26
 
 print('Done.')
 
-f = open('cyber-dataset.csv', 'a')
+#f = open('cyber-dataset.csv', 'a')
 
-for B in DATASET:
-	f.write(
-		str(B) + ';' +
-		DATASET[B]['title'] + ';' +
-		DATASET[B]['url'] + ';' +
-		DATASET[B]['author'] + ';' +
-		DATASET[B]['avg'] + ';' +
-		DATASET[B]['ratings'] + ';' +
-		DATASET[B]['year'].decode('utf-8') +
-		'\n'
-	)
+#for B in DATASET:
+#	f.write(
+#		str(B) + ';' +
+#		DATASET[B]['title'] + ';' +
+#		DATASET[B]['url'] + ';' +
+#		DATASET[B]['author'] + ';' +
+#		DATASET[B]['avg'].encode('utf-8') + ';' +
+#		DATASET[B]['ratings'].encode('utf-8') + ';' +
+#		DATASET[B]['year'].encode('utf-8') + '\n'
+#)
 
-f.close()
+#f.close()
 
 # PLOT
 
