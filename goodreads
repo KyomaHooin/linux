@@ -13,13 +13,13 @@
 import sqlite3,requests,StringIO,lxml.html,time,sys,re
 
 GOOD='https://www.goodreads.com'
-CYBER = GOOD + '/shelf/show/cyberpunk'
+SHELF = GOOD + '/shelf/show/cyberpunk'
 
 FOX = '/home/user/.mozilla/firefox/2wfpvx7b.default/cookies.sqlite'
 
 #--------------------------------------
 
-print('Goodreads Analyzer 1.0')
+print('Goodreads Analyzer 1.0\n')
 
 # COOKIE
 
@@ -27,74 +27,84 @@ print('Goodreads Analyzer 1.0')
 
 COOKIES={}
 
-#conn = sqlite3.connect(FOX)
-#cur = conn.cursor()
-#cur.execute("SELECT name,value FROM moz_cookies WHERE host = 'www.goodreads.com'")
-#rows = cur.fetchall()
-#for name,value in rows: COOKIES[name] = value
+print('Borowing cookies ...')
+
+try:
+	conn = sqlite3.connect(FOX)
+	cur = conn.cursor()
+	cur.execute("SELECT name,value FROM moz_cookies WHERE host = 'www.goodreads.com'")
+	rows = cur.fetchall()
+	for name,value in rows: COOKIES[name] = value
+except:
+	print('Failed to get cookies.')
+	sys.exit(1)
 
 # HARVEST & PARSE
 
+print('Harwesting data  ...\n\n(this may take a while)\n')
+
 DATASET = {}
 
-#for i = 1 to 25
-#req = requests.get(CYBER + '?page=2', cookies=COOKIES)
-#if req.status_code == 200:
-#	f.write(req.text.encode('utf-8'))
-#time.sleep(1)
+for i in range(1, 3):#26
+	req = requests.get(SHELF + '?page=' + str(i), cookies=COOKIES)
+	if req.status_code == 200:
+		p = lxml.html.HTMLParser()
+		t = lxml.html.parse(StringIO.StringIO(req.text), p)
+		o = t.xpath("//div[@class='elementList']")
 
-f = open('test.html', 'r')
+		for i in range(0,len(o)):
 
-p = lxml.html.HTMLParser()
-t = lxml.html.parse(StringIO.StringIO(f.read()),p)
-o = t.xpath("//div[@class='elementList']")
+			book = o[i].xpath(".//a[@class='bookTitle']")
 
-for i in range(0,len(o)):
+			if book:
+				book_title = book[0].text.encode('utf-8')
+				book_url = book[0].get('href').encode('utf-8')
+				book_id = re.sub('.*/(\d+).*', '\\1', book_url)
 
-	#<a class="bookTitle" href="/book/show/10084.River_of_Blue_Fire">River of Blue Fire (Otherland, #2)</a>
+			author = o[i].xpath(".//a[@class='authorName']//span")
 
-	book = o[i].xpath(".//a[contains(@class,'bookTitle')]")
-	
-	if book:
-		book_title = book[0].text.encode('utf-8')
-		book_url = book[0].get('href').encode('utf-8')
-		book_id = re.sub('.*/(\d+)\..*', '\\1', book_url)
+			if author:
+				book_author = author[0].text.encode('utf-8')
 
-	#<a class="authorName" itemprop="url" href="https://www.goodreads.com/author/show/426034.Lauren_Beukes">
-	#	<span itemprop="name">Lauren Beukes</span>
-	#/a>
+			data = o[i].xpath(".//span[@class='greyText smallText']")
 
-	author = o[i].xpath(".//a[contains(@class,'authorName')]//span")
+			if data:
+				book_avg = re.findall('avg rating.*', data[0].text)
+				book_ratings = re.findall('.*ratings', data[0].text)
+				book_published = re.findall('published.*', data[0].text)
 
-	if author:
-		book_author = author[0].text.encode('utf-8')
+			DATASET[book_id] = {
+				'title':book_title,
+				'url':book_url,
+				'author':book_author,
+				'avg': re.sub('avg rating (.*) .*', '\\1', book_avg[0]),
+				'ratings':re.sub('(.*) ratings.*', '\\1', book_ratings[0]).strip(),
+				'year':re.sub('published (.*)', '\\1', book_published[0]).strip()
+			}
+	time.sleep(2)
 
-	#<span class="greyText smallText">
-	#	avg rating 4.01 —
-	#	2,206 ratings  —
-	#	published 1989
-	#</span>
+print('Done.')
 
-	data = o[i].xpath(".//span[contains(@class,'greyText smallText')]")
+f = open('cyber-dataset.csv', 'a')
 
-	if data:
-		#g = open('line.bin', 'w')
-		#g.write(data[0].text.encode('utf-8'))
-		#g.close()
-
-		#book_avg = re.match('avg rating', data[0].text)
-
-		#book_ratings = re.sub('(.*)ratings.*', '\\1', data[0].text)
-		#print(book_ratings)
-		#book_published = re.sub('^.*published (.*)', '\\1', data[0].text)
-		#print(book_published)
-
-		sys.exit(1)
-
+for B in DATASET:
+	f.write(
+		str(B) + ';' +
+		DATASET[B]['title'] + ';' +
+		DATASET[B]['url'] + ';' +
+		DATASET[B]['author'] + ';' +
+		DATASET[B]['avg'] + ';' +
+		DATASET[B]['ratings'] + ';' +
+		DATASET[B]['year'].decode('utf-8') +
+		'\n'
+	)
 
 f.close()
 
 # PLOT
 
 # FILTER
+
+# EXIT
+
 
