@@ -9,21 +9,15 @@
 # https://www.goodreads.com/shelf/show/science-fiction?page=1 - 25 (1250)
 # https://www.goodreads.com/list/show/19341.Best_Science_Fiction?page=1 - 29 (2827)
 #
-# TODO:
-#
-#	-pages
-#	-slope
-#	-plot
-#
 
-import sqlite3,requests,StringIO,lxml.html,time,sys,re
-import matplotlib as plt
+import sqlite3,requests,StringIO,lxml.html,numpy,time,sys,re
+import matplotlib.pyplot as plt
 
 #--------------------------------------
 
 GOOD='https://www.goodreads.com'
 SHELF = GOOD + '/shelf/show/cyberpunk'
-LAST_PAGE = 25
+LAST_PAGE = 1# 25
 FOX = '/home/user/.mozilla/firefox/2wfpvx7b.default/cookies.sqlite'
 
 #--------------------------------------
@@ -48,7 +42,7 @@ except:
 
 # HARVEST & PARSE
 
-print('Harvesting data .. (this may take a while)')
+print('Harvesting data .. (this may take a while)\n')
 
 DATASET = {}
 
@@ -63,19 +57,25 @@ for i in range(1, LAST_PAGE + 1):
 		for i in range(0,len(o)):
 
 			book = o[i].xpath(".//a[@class='bookTitle']")
-
 			if book:
 				book_title = book[0].text.encode('utf-8')
 				book_url = book[0].get('href').encode('utf-8')
 				book_id = re.sub('.*/(\d+).*', '\\1', book_url)
+				# book pages & rating detail
+				try:
+					req2 = requests.get(GOOD + book_url, cookies=COOKIES)
+					if req2.status_code == 200:
+						p2 = lxml.html.HTMLParser()
+						t2 = lxml.html.parse(StringIO.StringIO(req2.text), p2)
+						o2 = t2.xpath("//span[@itemprop='numberOfPages']")
+						book_pages = re.sub('(\d+).*', '\\1', o2[0].text)
+				except: book_pages = ''
 
 			author = o[i].xpath(".//a[@class='authorName']//span")
-
 			if author:
 				book_author = author[0].text.encode('utf-8')
 
 			data = o[i].xpath(".//span[@class='greyText smallText']")
-
 			if data:
 				book_avg = re.findall('avg rating.*', data[0].text)
 				book_ratings = re.findall('.*ratings', data[0].text)
@@ -85,33 +85,85 @@ for i in range(1, LAST_PAGE + 1):
 				'title':book_title,
 				'url':book_url,
 				'author':book_author,
+				'pages':book_pages,
 				'avg': re.sub('avg rating (.*) .*', '\\1', book_avg[0]),
 				'ratings':re.sub('(.*) ratings.*', '\\1', book_ratings[0]).strip(),
 				'year':re.sub('published (.*)', '\\1', book_published[0]).strip()
 			}
-	time.sleep(2)
+	# hold on a second..
+	time.sleep(1)
 
-print('Done.')
+print('\nDone.')
 
-#f = open('cyber-dataset.csv', 'a')
+# DATASET
 
-#for B in DATASET:
-#	f.write(
-#		str(B) + ';' +
-#		DATASET[B]['title'] + ';' +
-#		DATASET[B]['url'] + ';' +
-#		DATASET[B]['author'] + ';' +
-#		DATASET[B]['avg'].encode('utf-8') + ';' +
-#		DATASET[B]['ratings'].encode('utf-8') + ';' +
-#		DATASET[B]['year'].encode('utf-8') + '\n'
-#)
+with open('cyber-dataset.csv', 'a') as f:
+	for BOOK in DATASET:
+		f.write(
+			str(BOOK) + ';' +
+			DATASET[BOOK]['title'] + ';' +
+			DATASET[BOOK]['url'] + ';' +
+			DATASET[BOOK]['author'] + ';' +
+			DATASET[BOOK]['pages'] + ';' +
+			DATASET[BOOK]['avg'].encode('utf-8') + ';' +
+			DATASET[BOOK]['ratings'].encode('utf-8') + ';' +
+			DATASET[BOOK]['year'].encode('utf-8') + '\n'
+		)
 
-#f.close()
+# CLEANUP
+
+#for BOOK in DATASET:
+#	if re.match('Shadowrun', DATASET[BOOK]['title']): del DATASET[BOOK]
 
 # PLOT
+
+#plt.subplots(figsize=(8,7), facecolor='white')
+
+for BOOK in DATASET:
+	book_year_num = int(DATASET[BOOK]['year'])
+	if book_year_num < 1975: COLOR = '#F3C300'
+	if book_year_num >= 1975 and book_year_num < 2003: COLOR = '#875692'
+	if book_year_num >= 2003 and book_year_num < 2010: COLOR = '#F38400'
+	if book_year_num > 2010: COLOR = '#A1CAF1'
+
+	if int(DATASET[BOOK]['pages']) <= 350:
+		SIZE = 7
+	else:
+		SIZE = 11 
+
+	# plot books
+	plt.plot(
+		int(DATASET[BOOK]['ratings'].replace(',','')),
+		float(DATASET[BOOK]['avg']),
+		'o',
+		markeredgewidth = 1.5,
+		markeredgecolor = 'black',
+		markerfacecolor = COLOR,
+		markersize = SIZE		
+	)
+
+# plot desired lines..
+#plt.plot(
+#	numpy.array(set1),
+#	intercept + slope*numpy.array(set1),
+#	'black',
+#	linewidth=1.5
+#)
+
+plt.xlabel('Number of ratings', fontsize=13)
+plt.ylabel('Average Rating', fontsize=13)
+plt.grid(True)
+plt.title('Goodreads - Popular Cyberpunk', fontsize=20)
+
+#plt.subplots_adjust( left=0.1,right=0.8)
+#plt.legend(frameon=False, numpoints=1, loc='center left',handletextpad=0, bbox_to_anchor=(1,0.5))
+
+plt.savefig(filename='popular-cyberpunk.png', format='png', dpi=300)
+plt.close()
 
 # FILTER
 
 # EXIT
 
+sys.exit(0)
 
