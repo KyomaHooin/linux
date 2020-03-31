@@ -5,158 +5,180 @@
 #
 # apt-get install python-requests python-matplotlib
 #
-# https://www.goodreads.com/shelf/show/cyberpunk?page=1 1 - 25 (1250
-# https://www.goodreads.com/shelf/show/science-fiction?page=1 - 25 (1250)
-# https://www.goodreads.com/list/show/19341.Best_Science_Fiction?page=1 - 29 (2827)
+# https://www.goodreads.com/shelf/show/cyberpunk?page=1 [1 - 25 = 1250]
+# https://www.goodreads.com/shelf/show/science-fiction?page=1 [1 -25 1250]
+# https://www.goodreads.com/list/show/19341.Best_Science_Fiction?page=1 [1- 29 2827]
 #
 
 import sqlite3,requests,StringIO,lxml.html,numpy,time,sys,re
 import matplotlib.pyplot as plt
 
+FOX = '/home/user/.mozilla/firefox/2wfpvx7b.default/cookies.sqlite'
 GOOD='https://www.goodreads.com'
 SHELF = GOOD + '/shelf/show/cyberpunk'
+
+OUTFILE='cyber-dataset.csv'
 LAST_PAGE = 1# 25
-FOX = '/home/user/.mozilla/firefox/2wfpvx7b.default/cookies.sqlite'
+
+HARVEST = 0
+PLOT = 0
+
+if len(sys.argv) <= 1:
+	print('Usage: ./goodreads [--harvest|--plot]')
+	sys.exit(1)
+
+if sys.argv[1] == '--harvest': HARVEST=True
+if sys.argv[1] == '--plot': PLOT=True
 
 #--------------------------------------
 
 print('Goodreads Analyzer 1.0\n')
 
-# COOKIE
+if HARVEST:
+	# COOKIE
+	#
+	# https://goodreads.com -> Remember login -> Login -> Quit
 
-# https://goodreads.com -> Remember login -> Login -> Quit)
+	COOKIES={}
 
-COOKIES={}
+	try:
+		conn = sqlite3.connect(FOX)
+		cur = conn.cursor()
+		cur.execute("SELECT name,value FROM moz_cookies WHERE host = 'www.goodreads.com'")
+		rows = cur.fetchall()
+		for name,value in rows: COOKIES[name] = value
+	except:
+		print('Failed to get cookies.')
+		sys.exit(1)
 
-try:
-	conn = sqlite3.connect(FOX)
-	cur = conn.cursor()
-	cur.execute("SELECT name,value FROM moz_cookies WHERE host = 'www.goodreads.com'")
-	rows = cur.fetchall()
-	for name,value in rows: COOKIES[name] = value
-except:
-	print('Failed to get cookies.')
-	sys.exit(1)
+	# HARVEST & PARSE
 
-# HARVEST & PARSE
+	print('Harvesting data .. (this may take a while)\n')
 
-print('Harvesting data .. (this may take a while)\n')
+	DATASET = {}
 
-DATASET = {}
+	for i in range(1, LAST_PAGE + 1):
+		print('Page: ' + str(i))
+		req = requests.get(SHELF + '?page=' + str(i), cookies=COOKIES)
+		if req.status_code == 200:
+			p = lxml.html.HTMLParser()
+			t = lxml.html.parse(StringIO.StringIO(req.text), p)
+			o = t.xpath("//div[@class='elementList']")
 
-for i in range(1, LAST_PAGE + 1):
-	print('Page: ' + str(i))
-	req = requests.get(SHELF + '?page=' + str(i), cookies=COOKIES)
-	if req.status_code == 200:
-		p = lxml.html.HTMLParser()
-		t = lxml.html.parse(StringIO.StringIO(req.text), p)
-		o = t.xpath("//div[@class='elementList']")
+			for i in range(0,len(o)):
 
-		for i in range(0,len(o)):
+				book = o[i].xpath(".//a[@class='bookTitle']")
+				if book:
+					book_title = book[0].text.encode('utf-8')
+					book_url = book[0].get('href').encode('utf-8')
+					book_id = re.sub('.*/(\d+).*', '\\1', book_url)
+					# book pages & rating detail
+					try:
+						req2 = requests.get(GOOD + book_url, cookies=COOKIES)
+						if req2.status_code == 200:
+							p2 = lxml.html.HTMLParser()
+							t2 = lxml.html.parse(StringIO.StringIO(req2.text), p2)
+							o2 = t2.xpath("//span[@itemprop='numberOfPages']")
+							book_pages = re.sub('(\d+).*', '\\1', o2[0].text)
+					except: book_pages = ''
 
-			book = o[i].xpath(".//a[@class='bookTitle']")
-			if book:
-				book_title = book[0].text.encode('utf-8')
-				book_url = book[0].get('href').encode('utf-8')
-				book_id = re.sub('.*/(\d+).*', '\\1', book_url)
-				# book pages & rating detail
-				try:
-					req2 = requests.get(GOOD + book_url, cookies=COOKIES)
-					if req2.status_code == 200:
-						p2 = lxml.html.HTMLParser()
-						t2 = lxml.html.parse(StringIO.StringIO(req2.text), p2)
-						o2 = t2.xpath("//span[@itemprop='numberOfPages']")
-						book_pages = re.sub('(\d+).*', '\\1', o2[0].text)
-				except: book_pages = ''
+				author = o[i].xpath(".//a[@class='authorName']//span")
+				if author:
+					book_author = author[0].text.encode('utf-8')
 
-			author = o[i].xpath(".//a[@class='authorName']//span")
-			if author:
-				book_author = author[0].text.encode('utf-8')
+				data = o[i].xpath(".//span[@class='greyText smallText']")
+				if data:
+					book_avg = re.findall('avg rating.*', data[0].text)
+					book_ratings = re.findall('.*ratings', data[0].text)
+					book_published = re.findall('published.*', data[0].text)
 
-			data = o[i].xpath(".//span[@class='greyText smallText']")
-			if data:
-				book_avg = re.findall('avg rating.*', data[0].text)
-				book_ratings = re.findall('.*ratings', data[0].text)
-				book_published = re.findall('published.*', data[0].text)
+				DATASET[book_id] = {
+					'title':book_title,
+					'url':book_url,
+					'author':book_author,
+					'pages':book_pages,
+					'avg': re.sub('avg rating (.*) .*', '\\1', book_avg[0]),
+					'ratings':re.sub('(.*) ratings.*', '\\1', book_ratings[0]).strip(),
+					'year':re.sub('published (.*)', '\\1', book_published[0]).strip()
+				}
+		# hold on a second..
+		time.sleep(1)
 
-			DATASET[book_id] = {
-				'title':book_title,
-				'url':book_url,
-				'author':book_author,
-				'pages':book_pages,
-				'avg': re.sub('avg rating (.*) .*', '\\1', book_avg[0]),
-				'ratings':re.sub('(.*) ratings.*', '\\1', book_ratings[0]).strip(),
-				'year':re.sub('published (.*)', '\\1', book_published[0]).strip()
-			}
-	# hold on a second..
-	time.sleep(1)
+		print('\nDone.')
 
-print('\nDone.')
+	# WRITE DATASET
 
-# DATASET
+	with open(OUTFILE, 'a') as f:
+		for BOOK in DATASET:
+			f.write(
+				str(BOOK) + ';' +
+				DATASET[BOOK]['title'] + ';' +
+				DATASET[BOOK]['url'] + ';' +
+				DATASET[BOOK]['author'] + ';' +
+				DATASET[BOOK]['pages'] + ';' +
+				DATASET[BOOK]['avg'].encode('utf-8') + ';' +
+				DATASET[BOOK]['ratings'].encode('utf-8') + ';' +
+				DATASET[BOOK]['year'].encode('utf-8') + '\n'
+			)
 
-with open('cyber-dataset.csv', 'a') as f:
+if PLOT:
+
+	# LOAD DATASET
+
+	# CLEANUP
+
+	#for BOOK in DATASET:
+	#	if re.match('Shadowrun', DATASET[BOOK]['title']): del DATASET[BOOK]
+	#	if re.match('Manga', DATASET[BOOK]['title']): del DATASET[BOOK]
+
+	# PLOT
+
+	#plt.subplots(figsize=(8,7), facecolor='white')
+
 	for BOOK in DATASET:
-		f.write(
-			str(BOOK) + ';' +
-			DATASET[BOOK]['title'] + ';' +
-			DATASET[BOOK]['url'] + ';' +
-			DATASET[BOOK]['author'] + ';' +
-			DATASET[BOOK]['pages'] + ';' +
-			DATASET[BOOK]['avg'].encode('utf-8') + ';' +
-			DATASET[BOOK]['ratings'].encode('utf-8') + ';' +
-			DATASET[BOOK]['year'].encode('utf-8') + '\n'
+		# COLOR BY YEAR
+		book_year_num = int(DATASET[BOOK]['year'])
+		if book_year_num < 1975: COLOR = '#F3C300'
+		if book_year_num >= 1975 and book_year_num < 2003: COLOR = '#875692'
+		if book_year_num >= 2003 and book_year_num < 2010: COLOR = '#F38400'
+		if book_year_num > 2010: COLOR = '#A1CAF1'
+
+		# SIZE BY PAGES
+		if int(DATASET[BOOK]['pages']) <= 350:
+			SIZE = 7
+		else:
+			SIZE = 11 
+
+		# PLOT
+		plt.plot(
+			int(DATASET[BOOK]['ratings'].replace(',','')),
+			float(DATASET[BOOK]['avg']),
+			'o',
+			markeredgewidth = 1.5,
+			markeredgecolor = 'black',
+			markerfacecolor = COLOR,
+			markersize = SIZE		
 		)
 
-# CLEANUP
+	# AVERAGE RATING
+	plt.axhline(y=sum([float(DATASET[book]['avg']) for book in DATASET]) / len(DATASET), linewidth=2, color='k')
 
-#for BOOK in DATASET:
-#	if re.match('Shadowrun', DATASET[BOOK]['title']): del DATASET[BOOK]
+	# AVERAGE RATING COUNT
+	plt.axvline(x=sum([int(DATASET[book]['ratings'].replace(',','')) for book in DATASET]) / len(DATASET), linewidth=2, color='k')
 
-# PLOT
+	# LEGEND & LABEL
+	Plt.xlabel('Number of ratings', fontsize=13)
+	plt.ylabel('Average Rating', fontsize=13)
+	plt.grid(True)
+	plt.title('Goodreads - Popular Cyberpunk', fontsize=20)
 
-#plt.subplots(figsize=(8,7), facecolor='white')
+	#plt.subplots_adjust( left=0.1,right=0.8)
+	#plt.legend(frameon=False, numpoints=1, loc='center left',handletextpad=0, bbox_to_anchor=(1,0.5))
 
-for BOOK in DATASET:
-	book_year_num = int(DATASET[BOOK]['year'])
-	if book_year_num < 1975: COLOR = '#F3C300'
-	if book_year_num >= 1975 and book_year_num < 2003: COLOR = '#875692'
-	if book_year_num >= 2003 and book_year_num < 2010: COLOR = '#F38400'
-	if book_year_num > 2010: COLOR = '#A1CAF1'
+	# CREATE IMAGE
+	plt.savefig(filename='popular-cyberpunk.png', format='png', dpi=300)
 
-	if int(DATASET[BOOK]['pages']) <= 350:
-		SIZE = 7
-	else:
-		SIZE = 11 
-
-	# plot books
-	plt.plot(
-		int(DATASET[BOOK]['ratings'].replace(',','')),
-		float(DATASET[BOOK]['avg']),
-		'o',
-		markeredgewidth = 1.5,
-		markeredgecolor = 'black',
-		markerfacecolor = COLOR,
-		markersize = SIZE		
-	)
-
-# average rating average
-plt.axhline(y=sum([float(DATASET[book]['avg']) for book in DATASET]) / len(DATASET), linewidth=2, color='k')
-# average rating count
-plt.axvline(x=sum([int(DATASET[book]['ratings'].replace(',','')) for book in DATASET]) / len(DATASET), linewidth=2, color='k')
-
-plt.xlabel('Number of ratings', fontsize=13)
-plt.ylabel('Average Rating', fontsize=13)
-plt.grid(True)
-plt.title('Goodreads - Popular Cyberpunk', fontsize=20)
-
-#plt.subplots_adjust( left=0.1,right=0.8)
-#plt.legend(frameon=False, numpoints=1, loc='center left',handletextpad=0, bbox_to_anchor=(1,0.5))
-
-plt.savefig(filename='popular-cyberpunk.png', format='png', dpi=300)
-plt.close()
-
-# FILTER
+	plt.close()
 
 # EXIT
 
