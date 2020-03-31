@@ -24,11 +24,15 @@ HARVEST = 0
 PLOT = 0
 
 if len(sys.argv) <= 1:
-	print('Usage: ./goodreads [--harvest|--plot]')
+	print('Usage: ./goodreads [--harvest][--plot all|detail]')
 	sys.exit(1)
 
 if sys.argv[1] == '--harvest': HARVEST=True
-if sys.argv[1] == '--plot': PLOT=True
+if sys.argv[1] == '--plot':
+	if len(sys.argv) != 3:
+		print('Usage: ./goodreads [--plot all|detail]')
+		sys.exit(1)
+	PLOT=True
 
 #--------------------------------------
 
@@ -125,29 +129,46 @@ if PLOT:
 
 	# LOAD DATASET
 
+	DATASET={}
+
+	with open(OUTFILE, 'r') as f:
+		for line in f:
+			record = line.split(';')
+			DATASET[record[0]] = {
+				'title':record[1],
+				'url':record[2],
+				'author':record[3],
+				'pages':record[4],
+				'avg':record[5],
+				'ratings':record[6],
+				'year':record[7].strip()
+			}
+
 	# CLEANUP
 
 	#for BOOK in DATASET:
 	#	if re.match('Shadowrun', DATASET[BOOK]['title']): del DATASET[BOOK]
 	#	if re.match('Manga', DATASET[BOOK]['title']): del DATASET[BOOK]
 
-	# PLOT
+	if sys.argv(3) == 'all':
 
-	#plt.subplots(figsize=(8,7), facecolor='white')
+		# PLOT ALL
 
-	for BOOK in DATASET:
-		# COLOR BY YEAR
-		book_year_num = int(DATASET[BOOK]['year'])
-		if book_year_num < 1975: COLOR = '#F3C300'
-		if book_year_num >= 1975 and book_year_num < 2003: COLOR = '#875692'
-		if book_year_num >= 2003 and book_year_num < 2010: COLOR = '#F38400'
-		if book_year_num > 2010: COLOR = '#A1CAF1'
+		#plt.subplots(figsize=(8,7), facecolor='white')
 
-		# SIZE BY PAGES
-		if int(DATASET[BOOK]['pages']) <= 350:
-			SIZE = 7
-		else:
-			SIZE = 11 
+		for BOOK in DATASET:
+			# COLOR BY YEAR
+			book_year_num = int(DATASET[BOOK]['year'])
+			if book_year_num < 1975: COLOR = '#F3C300'
+			if book_year_num >= 1975 and book_year_num < 2003: COLOR = '#875692'
+			if book_year_num >= 2003 and book_year_num < 2010: COLOR = '#F38400'
+			if book_year_num > 2010: COLOR = '#A1CAF1'
+
+			# SIZE BY PAGES
+			if int(DATASET[BOOK]['pages']) <= 350:
+				SIZE = 7
+			else:
+				SIZE = 11 
 
 		# PLOT
 		plt.plot(
@@ -160,26 +181,28 @@ if PLOT:
 			markersize = SIZE		
 		)
 
-	# AVERAGE RATING
-	plt.axhline(y=sum([float(DATASET[book]['avg']) for book in DATASET]) / len(DATASET), linewidth=2, color='k')
+		# AVERAGE RATING
+		plt.axhline(y=sum([float(DATASET[book]['avg']) for book in DATASET]) / len(DATASET), linewidth=2, color='k')
 
-	# AVERAGE RATING COUNT
-	plt.axvline(x=sum([int(DATASET[book]['ratings'].replace(',','')) for book in DATASET]) / len(DATASET), linewidth=2, color='k')
+		# AVERAGE RATING COUNT
+		plt.axvline(x=sum([int(DATASET[book]['ratings'].replace(',','')) for book in DATASET]) / len(DATASET), linewidth=2, color='k')
 
-	# LEGEND & LABEL
-	Plt.xlabel('Number of ratings', fontsize=13)
-	plt.ylabel('Average Rating', fontsize=13)
-	plt.grid(True)
-	plt.title('Goodreads - Popular Cyberpunk', fontsize=20)
+		# LEGEND & LABEL
+		plt.xlabel('Number of ratings', fontsize=13)
+		plt.ylabel('Average Rating', fontsize=13)
+		plt.grid(True)
+		plt.title('Goodreads - Popular Cyberpunk', fontsize=20)
 
-	#plt.subplots_adjust( left=0.1,right=0.8)
-	#plt.legend(frameon=False, numpoints=1, loc='center left',handletextpad=0, bbox_to_anchor=(1,0.5))
+		#plt.subplots_adjust( left=0.1,right=0.8)
+		#plt.legend(frameon=False, numpoints=1, loc='center left',handletextpad=0, bbox_to_anchor=(1,0.5))
 
-	# CREATE IMAGE
-	plt.savefig(filename='popular-cyberpunk.png', format='png', dpi=300)
+		# CREATE IMAGE
+		plt.savefig(filename='popular-cyberpunk.png', format='png', dpi=300)
 
-	plt.close()
+		plt.close()
 
+		if sys.argv(3) == 'detail':
+			pass
 # EXIT
 
 sys.exit(0)
