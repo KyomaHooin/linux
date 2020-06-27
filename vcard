@@ -1,0 +1,43 @@
+#!/usr/bin/python
+#
+# BEGIN:VCARD
+# VERSION:2.1
+# N;CHARSET=UTF-8;ENCODING=QUOTED-PRINTABLE:;O2-Hlas s.Zahr;;;
+# FN;CHARSET=UTF-8;ENCODING=QUOTED-PRINTABLE:O2-Hlas s.Zahr
+# TEL;CELL:+420602989898
+#
+
+CSV='haha.csv'
+VCARD='Kontakty_2020.vcf'
+
+vcf = open(VCARD, 'a', 0)
+
+with open(CSV, 'r') as csv:
+	for line in csv:
+
+		#
+		# PARSE CSV
+		#
+
+		data  = line.strip().split(';')
+		phone = data[1].replace('\xc2\xa0','')
+		fixed_name=''
+		for part in data[0].split(' '):
+			if len(part) > 1:
+				fixed_name+=part[:1] + part[1:].lower() + ' '
+			else:
+				fixed_name+=part + ' '
+
+		#
+		# WRITE CARD
+		#
+
+		vcf.write('BEGIN:VCARD\r\n')
+		vcf.write('VERSION:2.1\r\n')
+		vcf.write('N;CHARSET=UTF-8;ENCODING=QUOTED-PRINTABLE:;' + fixed_name.strip() + ';;;' + '\r\n')
+		vcf.write('FN;CHARSET=UTF-8;ENCODING=QUOTED-PRINTABLE:' + fixed_name.strip() + '\r\n')
+		vcf.write('TEL;CELL:' + phone + '\r\n')
+		vcf.write('END:VCARD\r\n')
+
+vcf.close()
+

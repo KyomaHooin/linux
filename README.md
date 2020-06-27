@@ -17,6 +17,7 @@ cesnet_tcs_tiny.py - Cesnet TCS "tiny" client.
           git-init - Simple repo clone, init.
              sound - CLI radio player.
             srvadm - Multiple SSH remote.
+             vcard - CSV to vCard 2.1.
 
            git.txt - Git cheat sheet.
 </pre>
