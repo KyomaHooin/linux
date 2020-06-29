@@ -7,8 +7,10 @@
 # TEL;CELL:+420602989898
 #
 
-CSV='haha.csv'
-VCARD='Kontakty_2020.vcf'
+import unicodedata
+
+CSV='okasan.csv'
+VCARD='okasan.vcf'
 
 vcf = open(VCARD, 'a', 0)
 
@@ -20,13 +22,16 @@ with open(CSV, 'r') as csv:
 		#
 
 		data  = line.strip().split(';')
-		phone = data[1].replace('\xc2\xa0','')
-		fixed_name=''
-		for part in data[0].split(' '):
-			if len(part) > 1:
-				fixed_name+=part[:1] + part[1:].lower() + ' '
-			else:
-				fixed_name+=part + ' '
+
+		cell = data[1].replace('\xc2\xa0','').strip()
+		mobile = data[2].replace('\xc2\xa0','').strip()
+
+		phone=''
+
+		if cell: phone = cell
+		if mobile: phone = mobile
+
+		name = unicodedata.normalize('NFKD', data[0].decode('utf-8')).encode('ascii','ignore').strip()
 
 		#
 		# WRITE CARD
@@ -34,10 +39,10 @@ with open(CSV, 'r') as csv:
 
 		vcf.write('BEGIN:VCARD\r\n')
 		vcf.write('VERSION:2.1\r\n')
-		vcf.write('N;CHARSET=UTF-8;ENCODING=QUOTED-PRINTABLE:;' + fixed_name.strip() + ';;;' + '\r\n')
-		vcf.write('FN;CHARSET=UTF-8;ENCODING=QUOTED-PRINTABLE:' + fixed_name.strip() + '\r\n')
+		vcf.write('N;CHARSET=UTF-8;ENCODING=QUOTED-PRINTABLE:;' + name + ';;;' + '\r\n')
+		vcf.write('FN;CHARSET=UTF-8;ENCODING=QUOTED-PRINTABLE:' + name + '\r\n')
 		vcf.write('TEL;CELL:' + phone + '\r\n')
 		vcf.write('END:VCARD\r\n')
 
-vcf.close()
+#vcf.close()
 
