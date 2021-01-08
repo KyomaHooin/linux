@@ -1,8 +1,9 @@
 #!/bin/bash
 #
 
-URL='http://www.nhk.or.jp/r-news/podcast/nhkradionews.xml'
-URL2='http://fr1.lounge-radio.com:80/lounge128.mp3'
+LAUNGE='http://fr1.lounge-radio.com:80/lounge128.mp3'
+JAZZ='http://icecast2.play.cz/crojazz64.mp3'
+NHK='http://www.nhk.or.jp/r-news/podcast/nhkradionews.xml'
 
 if [[ "$1" != '-h' ]]; then
 	killall mpg123 2> /dev/null
@@ -10,25 +11,26 @@ if [[ "$1" != '-h' ]]; then
 fi
 
 case $1 in
-	-j)# Japan NHK Podcast
-		mpg123 -q $(wget -q -O - $URL | grep mp3 | sed -r 's/.*(http.*mp3).*/\1/') &
+	-j|--japan)# Japan NHK Podcast
+		mpg123 -q $(wget -q -O - $NHK | grep mp3 | sed -r 's/.*(http.*mp3).*/\1/') &
 	;;
-	-n)# Nihongo lesson
-		shift; for lesson in $@; do LIST+=" /root/nihongo/$lesson*"; done
-		mpg123 -q $LIST 2> /dev/null &
+	-z|--jazz)# Jazz
+		mpg123 -q "$JAZZ" &
 	;;
-	-h)# Usage
+	-l|--louge)# Smooth Lounge Radio
+		mpg123 -q "$LAUNGE" &
+	;;
+	-h|--help)# Usage
 		cat <<- EOL
 			Usage: sound [OPTION]
-			 -j             NHK podcast
-			 -n <lesson ..> Nihongo lesson
-			 -h             Print usage
-			 -k             Just stop music
+			 -h --help      Print help.
+			 -j --japan     NHK podcast.
+			 -z --jazz      CRO Jazz.
+			 -l --launge    FR Launge radio.
 		EOL
 	;;
-	-k)# Stop the music
+	*)# Default
+		echo "Usage: sound [-h] [-j] [-l] [-z]"
 	;;
-	*)# Smooth Lounge Radio
-		mpg123 -q $URL2 &
 esac
 
