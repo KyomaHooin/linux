@@ -5,11 +5,6 @@ LAUNGE='http://fr1.lounge-radio.com:80/lounge128.mp3'
 JAZZ='http://icecast2.play.cz/crojazz64.mp3'
 NHK='http://www.nhk.or.jp/r-news/podcast/nhkradionews.xml'
 
-if [[ "$1" != '-h' ]]; then
-	killall mpg123 2> /dev/null
-	killall mpg123.bin 2> /dev/null
-fi
-
 case $1 in
 	-j|--japan)# Japan NHK Podcast
 		mpg123 -q $(wget -q -O - $NHK | grep mp3 | sed -r 's/.*(http.*mp3).*/\1/') &
@@ -27,10 +22,15 @@ case $1 in
 			 -j --japan     NHK podcast.
 			 -z --jazz      CRO Jazz.
 			 -l --launge    FR Launge radio.
+			 -q --quit	Quit playing.
 		EOL
 	;;
+	-q)# Quit
+		killall mpg123 2> /dev/null
+		killall mpg123.bin 2> /dev/null
+	;;
 	*)# Default
-		echo "Usage: sound [-h] [-j] [-l] [-z]"
+		echo "Usage: sound [-h] [-j] [-l] [-q] [-z]"
 	;;
 esac
 
