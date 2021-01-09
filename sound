@@ -5,9 +5,15 @@ LAUNGE='http://fr1.lounge-radio.com:80/lounge128.mp3'
 JAZZ='http://icecast2.play.cz/crojazz64.mp3'
 NHK='http://www.nhk.or.jp/r-news/podcast/nhkradionews.xml'
 
+
+if [ "$1" ] && [ "$1" != '-h' ] && [ "$1" != '--help' ]; then
+	killall mpg123.bin 2>/dev/null
+	killall mpg123 2>/dev/null
+fi
+
 case $1 in
 	-j|--japan)# Japan NHK Podcast
-		mpg123 -q $(wget -q -O - $NHK | grep mp3 | sed -r 's/.*(http.*mp3).*/\1/') &
+		mpg123 -q $(wget -q -O - "$NHK" | grep mp3 | sed -r 's/.*(http.*mp3).*/\1/') &
 	;;
 	-z|--jazz)# Jazz
 		mpg123 -q "$JAZZ" &
@@ -15,22 +21,14 @@ case $1 in
 	-l|--louge)# Smooth Lounge Radio
 		mpg123 -q "$LAUNGE" &
 	;;
-	-h|--help)# Usage
+	-h|--help|*)# Usage
 		cat <<- EOL
 			Usage: sound [OPTION]
 			 -h --help      Print help.
 			 -j --japan     NHK podcast.
-			 -z --jazz      CRO Jazz.
 			 -l --launge    FR Launge radio.
-			 -q --quit	Quit playing.
+			 -z --jazz      CRO Jazz.
 		EOL
-	;;
-	-q)# Quit
-		killall mpg123 2> /dev/null
-		killall mpg123.bin 2> /dev/null
-	;;
-	*)# Default
-		echo "Usage: sound [-h] [-j] [-l] [-q] [-z]"
 	;;
 esac
 
