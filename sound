@@ -5,27 +5,20 @@ LAUNGE='http://fr1.lounge-radio.com:80/lounge128.mp3'
 JAZZ='http://icecast2.play.cz/crojazz64.mp3'
 NHK='http://www.nhk.or.jp/r-news/podcast/nhkradionews.xml'
 
-
-function silence(){
-	killall mpg123.bin 2>/dev/null
-	killall mpg123 2>/dev/null
-}
+killall mpg123.bin 2>/dev/null
+killall mpg123 2>/dev/null
 
 case $1 in
 	-j|--japan)# Japan NHK Podcast
-		silence
 		mpg123 -q $(wget -q -O - "$NHK" | grep mp3 | sed -r 's/.*(http.*mp3).*/\1/') &
 	;;
 	-z|--jazz)# Jazz
-		silence
 		mpg123 -q "$JAZZ" &
 	;;
 	-l|--louge)# Smooth Lounge Radio
-		silence
 		mpg123 -q "$LAUNGE" &
 	;;
 	-h|--help|*)# Usage
-		silence
 		cat <<- EOL
 			Usage: sound [OPTION]
 			 -h --help      Print help.
