@@ -8,7 +8,7 @@ case $1 in
 		/usr/sbin/openvpn --cd /etc/openvpn/client --config client.ovpn --route-up fix_route --daemon
 	;;
 	--stop)# Stop VPN
-		kill -s 'SIGTERM' $(pidof openvpn) 
+		kill -s 'SIGTERM' $(pidof openvpn) 2> /dev/null 
 	;;
 	-h|--help|*)# Usage
 		cat <<- EOL
