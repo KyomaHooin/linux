@@ -48,3 +48,7 @@ git checkout master
 git merge --no-ff user-branch
 git push origin master
 
+MULTIKEY DEPLOY
+
+GIT_SSH_COMMAND='ssh -i ~/.ssh/priv_key' git push origin master
+
