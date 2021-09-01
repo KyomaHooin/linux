@@ -3,14 +3,28 @@
 # VPN
 #
 
+NET='147.231.80'
+
 case $1 in
-	--start)# Start VPN
-		/usr/sbin/openvpn --cd /etc/openvpn/client --config client.ovpn --route-up fix_route --daemon
+	--start)
+		if [ -n "$(pidof openvpn)" ]; then
+			echo "Already running."
+			exit 1
+		fi
+		/usr/sbin/openvpn --cd /etc/openvpn --config client.ovpn --route-up fix_route --daemon
+		# Wait for routing.
+		while [ -z "$(ip r | grep $NET)" ];
+		do
+			echo -n '.'
+			sleep 1
+		done
+		# Done.
+		echo
 	;;
-	--stop)# Stop VPN
-		kill -s 'SIGTERM' $(pidof openvpn) 2> /dev/null 
+	--stop)
+		kill -s 'SIGTERM' $(pidof openvpn) 2>/dev/null
 	;;
-	-h|--help|*)# Usage
+	-h|--help|*)
 		cat <<- EOL
 			Usage: vpn [--start] [--stop]
 			 -h --help    Print help.
