@@ -52,3 +52,9 @@ MULTIKEY DEPLOY
 
 GIT_SSH_COMMAND='ssh -i ~/.ssh/priv_key' git push origin master
 
+BRANCH
+
+git checkout -b branch
+...
+gut push origin branch
+
