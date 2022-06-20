@@ -93,12 +93,12 @@ if(!empty($raw)) {
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title>2FA</title>
-	<link href="../bootstrap.min.css" rel="stylesheet">
+	<link href="bootstrap.min.css" rel="stylesheet">
 	<!-- Favicons -->
-	<link rel="apple-touch-icon" href="../favicon/apple-touch-icon.png" sizes="180x180">
-	<link rel="icon" href="../favicon/favicon-32x32.png" sizes="32x32" type="image/png">
-	<link rel="icon" href="../favicon/favicon-16x16.png" sizes="16x16" type="image/png">
-	<link rel="mask-icon" href="../favicon/safari-pinned-tab.svg" color="#7952b3">
+	<link rel="apple-touch-icon" href="./favicon/apple-touch-icon.png" sizes="180x180">
+	<link rel="icon" href="./favicon/favicon-32x32.png" sizes="32x32" type="image/png">
+	<link rel="icon" href="./favicon/favicon-16x16.png" sizes="16x16" type="image/png">
+	<link rel="mask-icon" href="./favicon/safari-pinned-tab.svg" color="#7952b3">
 	<!-- Custom styles -->
 	<link href="custom.css" rel="stylesheet">
 </head>
