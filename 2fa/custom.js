@@ -9,7 +9,6 @@ function clip(service) {
 }
 
 async function token(format) {
-	controller = new AbortController();
 	return await fetch('/2fa/', {
 		method: 'POST',
 		headers: {
@@ -30,7 +29,6 @@ async function token(format) {
 }
 
 async function gen_token(format) {
-
 	const tk = await this.token(format);
 
 	if (tk) {
@@ -40,3 +38,4 @@ async function gen_token(format) {
 		document.getElementById(format).innerHTML = "error";
 	}
 }
+
