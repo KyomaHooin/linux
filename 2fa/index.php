@@ -4,8 +4,8 @@
 # https://gist.github.com/vhdm/f6e42479e1fb9f119d3d
 #
 
-$git_secret='xxx';
-$proton_secret='xxx';
+$git_secret='VVBZKIJ65FDZPA44';
+$proton_secret='G3EJWXRJDZ26RV4757TDP4NLIFFJTZH4';
 
 $raw = file_get_contents('php://input');
 
@@ -115,7 +115,7 @@ if(!empty($raw)) {
 
 	</div>
 
-	<div class="col-5 col-md-3 bg-white rounded-3 border border-dark">
+	<div class="col-5 col-md-3 bg-white rounded-3 border border-secondary shadow">
 		<div class="row">
 			<div id="git" class="col fs-2">&nbsp;</div>
 			<div class="col-3 col-md-2 d-flex align-items-center">
@@ -134,7 +134,7 @@ if(!empty($raw)) {
 
 	</div>
 
-	<div class="col-5 col-md-3 bg-white rounded-3 border border-dark">
+	<div class="col-5 col-md-3 bg-white rounded-3 border border-secondary shadow">
 		<div class="row">
 			<div id="proton" class="col fs-2">&nbsp;</div>
 			<div class="col-3 col-md-2 d-flex align-items-center">
