@@ -1,0 +1,32 @@
+#!/usr/bin/python3
+
+import requests,smtplib,lxml.html,io
+from email.mime.text import MIMEText
+
+URL='xxx'
+
+OUTUSR='info@xxx.cz'
+OUTSRV='smtps21.cz.o2.com'
+OUTBOX='+420xxx@sms.cz.o2.com'
+
+session = requests.Session()
+session.headers.update({'User-Agent' : 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:70.0) Gecko/20100101 Firefox/70.0'})
+
+req = session.get(URL)
+
+p = lxml.html.HTMLParser()
+t = lxml.html.parse(io.StringIO(req.text), p)
+
+data = t.xpath(".//select[@name='velikost']/option")
+
+if '10,5' in [size.text for size in data]:
+	msg = MIMEText('xxx!')
+	msg['From'] = OUTUSR
+	msg['To'] = OUTBOX
+
+	mail = smtplib.SMTP(OUTSRV)
+	mail.sendmail(OUTUSR, OUTBOX, msg.as_string())
+	mail.quit()
+
+session.close()
+

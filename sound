@@ -8,9 +8,11 @@ NHK='http://www.nhk.or.jp/r-news/podcast/nhkradionews.xml'
 killall mpg123.bin 2>/dev/null
 killall mpg123 2>/dev/null
 
-case $1 in
+case "$1" in
 	-j|--japan)# Japan NHK Podcast
-		mpg123 -q $(wget -q -O - "$NHK" | grep mp3 | sed -r 's/.*(http.*mp3).*/\1/') &
+	 	for F in $(wget -q -O - "$NHK" | grep mp3 | sed -r 's/.*(http.*64k.mp3).*/\1/'); do
+			wget -q -o /dev/null -O - "$F" | mpg123 -
+		done
 	;;
 	-z|--jazz)# Jazz
 		mpg123 -q "$JAZZ" &
