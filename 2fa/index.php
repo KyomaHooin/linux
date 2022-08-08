@@ -6,6 +6,7 @@
 
 $git_secret='VVBZKIJ65FDZPA44';
 $proton_secret='G3EJWXRJDZ26RV4757TDP4NLIFFJTZH4';
+$lab_secret='RXEFYPZXM3CCXYVYAOZCVR2BP7L4QGNI';
 
 $raw = file_get_contents('php://input');
 
@@ -79,6 +80,9 @@ if(!empty($raw)) {
 		case 'proton':
 			print(oath_hotp(base32_decode($proton_secret), get_timestamp(30)));
 			break;
+		case 'lab':
+			print(oath_hotp(base32_decode($lab_secret), get_timestamp(30)));
+			break;
 		default:
 			print('error');
 			break;
@@ -144,6 +148,27 @@ if(!empty($raw)) {
 	</div>
 
 </div>
+
+<div class="row m-4 mx-2 align-items-center justify-content-center">
+
+	<div class="col-3 col-md-1">
+
+	
+	<svg width="56" height="56" onclick="gen_token('lab')" viewBox="-.1 .5 960.1 923.7" xmlns="http://www.w3.org/2000/svg"><path d="m958.9 442.4c1.1 26.1-2 52.1-9.2 77.2-7.1 25.1-18.3 48.8-33.1 70.3a240.43 240.43 0 0 1 -53.6 56.2l-.5.4-199.9 149.8-98.3 74.5-59.9 45.2c-3.5 2.7-7.4 4.7-11.5 6.1s-8.5 2.1-12.9 2.1c-4.3 0-8.7-.7-12.8-2.1s-8-3.4-11.5-6.1l-59.9-45.2-98.3-74.5-198.7-148.9-1.2-.8-.4-.4c-20.9-15.7-39-34.7-53.8-56.2s-26-45.3-33.2-70.4c-7.2-25.1-10.3-51.2-9.2-77.3 1.2-26.1 6.5-51.8 15.8-76.2l1.3-3.5 130.7-340.5q1-2.5 2.4-4.8 1.3-2.3 3.1-4.3 1.7-2.1 3.7-3.9 2-1.7 4.2-3.2c3.1-1.9 6.3-3.3 9.8-4.1 3.4-.9 7-1.3 10.5-1.1 3.6.2 7.1.9 10.4 2.2 3.3 1.2 6.5 3 9.3 5.2q2 1.7 3.9 3.6 1.8 2 3.2 4.3 1.5 2.2 2.6 4.7 1.1 2.4 1.8 5l88.1 269.7h356.6l88.1-269.7q.7-2.6 1.9-5 1.1-2.4 2.6-4.7 1.4-2.2 3.2-4.2 1.8-2 3.9-3.7c2.8-2.2 5.9-3.9 9.2-5.2 3.4-1.2 6.9-1.9 10.4-2.1 3.6-.2 7.1.1 10.6 1 3.4.9 6.7 2.3 9.7 4.2q2.3 1.4 4.3 3.2 2 1.7 3.7 3.8 1.7 2.1 3.1 4.4 1.3 2.3 2.3 4.8l130.5 340.6 1.3 3.5c9.3 24.3 14.6 50 15.7 76.1z" fill="#171321"/></svg>
+
+	</div>
+
+	<div class="col-5 col-md-3 bg-white rounded-3 border border-secondary shadow">
+		<div class="row">
+			<div id="lab" class="col fs-2">&nbsp;</div>
+			<div class="col-3 col-md-2 d-flex align-items-center">
+				<svg xmlns="http://www.w3.org/2000/svg" onclick="clip('lab')" class="bi bi-clipboard" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/></svg>
+			</div>
+		</div>
+	</div>
+
+</div>
+
 
 </form>
 </main>
