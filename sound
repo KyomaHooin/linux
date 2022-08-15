@@ -2,7 +2,7 @@
 #
 
 LAUNGE='http://fr1.lounge-radio.com:80/lounge128.mp3'
-JAZZ='http://icecast2.play.cz/crojazz64.mp3'
+JAZZ='https://rozhlas.stream/jazz_mp3_128.mp3'
 NHK='http://www.nhk.or.jp/r-news/podcast/nhkradionews.xml'
 
 killall mpg123.bin 2>/dev/null
@@ -15,7 +15,7 @@ case "$1" in
 		done
 	;;
 	-z|--jazz)# Jazz
-		mpg123 -q "$JAZZ" &
+		wget -q -o /dev/null -O - "$JAZZ" | mpg123 -q - &
 	;;
 	-l|--louge)# Smooth Lounge Radio
 		mpg123 -q "$LAUNGE" &
