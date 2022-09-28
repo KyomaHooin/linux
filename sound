@@ -1,5 +1,4 @@
 #!/bin/bash
-#
 
 LAUNGE='http://fr1.lounge-radio.com:80/lounge128.mp3'
 JAZZ='https://rozhlas.stream/jazz_mp3_128.mp3'
@@ -15,10 +14,18 @@ case "$1" in
 		done
 	;;
 	-z|--jazz)# Jazz
-		wget -q -o /dev/null -O - "$JAZZ" | mpg123 -q - &
+		if [ "$2" == '-v' ]; then
+			wget -q -o /dev/null -O - "$JAZZ" | mpg123 -
+		else
+			wget -q -o /dev/null -O - "$JAZZ" | mpg123 -q - &
+		fi
 	;;
 	-l|--louge)# Smooth Lounge Radio
-		mpg123 -q "$LAUNGE" &
+		if [ "$2" == '-v' ]; then
+			mpg123 "$LAUNGE"
+		else
+			mpg123 -q "$LAUNGE" &
+		fi
 	;;
 	-h|--help|*)# Usage
 		cat <<- EOL
