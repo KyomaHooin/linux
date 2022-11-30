@@ -1,0 +1,35 @@
+#!/bin/bash
+#
+#  WireGuard
+#
+
+PRIVKEY='/etc/wireguard/privkey'
+SHARED='/etc/wireguard/preshared'
+ENDPOINT='xxx'
+DNS='172.16.6.1'
+
+case "$1" in
+	--start)
+		ip link add dev wg0 type wireguard
+		ip address add dev wg0 172.16.6.4/32
+		wg set wg0 private-key "$PRIVKEY" peer xxx preshared-key "$SHARED" endpoint "$ENDPOINT":51820 persistent-keepalive 25 allowed-ips 0.0.0.0/0
+		ip link set up dev wg0
+		ip route add 172.16.0.0/16 dev wg0
+	;;
+	--stop)
+		ip link set down wg0
+		ip link del wg0
+	;;
+	--host)
+		host -4 "$2" "$DNS"
+	;;
+	-h|--help|*)# Usage
+		cat <<- EOL
+			Usage: wire [--start] [--stop] [--host IP]
+			 --start    Start WireGuard VPN.
+			 --stop     Stop WireGuard VPN.
+			 --host IP  Host lookup.
+	EOL
+	;;
+esac
+
