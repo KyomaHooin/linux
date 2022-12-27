@@ -4,6 +4,7 @@ git config --global user.email "email@address"
 CLONE
 
 git clone https://github.com/KyomaHooin/Repo
+git clone git@github.com:KoymaHooin/repo
 
 FIRST COMMIT
 
