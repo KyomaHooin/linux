@@ -36,9 +36,9 @@ if (isset($_POST['action'])) {
 
 <div class="row my-4">
 	<form method="post" action="." enctype="multipart/form-data">
-	<div class="d-grid gap-2 col-8 col-md-4 mx-auto">
-		<button class="btn btn-danger" type="submit" name="action" value="reboot">Reboot</button>
-		<button class="btn btn-danger" type="submit" name="action" value="shutdown">Shutdown</button>
+	<div class="d-grid gap-4 col col-md-4  mx-auto">
+		<button class="btn btn-danger shadow" type="submit" name="action" value="reboot">Reboot</button>
+		<button class="btn btn-danger shadow" type="submit" name="action" value="shutdown">Shutdown</button>
 	</div>
 	</form>
 </div>
