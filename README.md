@@ -3,6 +3,16 @@ DESCRIPTION
 
 Some kuddo shell staff.
 
+RASPBERRY 3A+ TUNE
+<pre>
+# HTDMI audio
+
+#dtparam=audio=on
+
+# GPIO shutdown
+
+dtoverlay=gpio-shutdown
+</pre>
 FILE
 <pre>
               acme - ACME certificate renewal with acme_tiny.py.

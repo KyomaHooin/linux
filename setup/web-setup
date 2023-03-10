@@ -1,0 +1,23 @@
+#!/usr/bin/python3
+#
+# Simple system runner
+#
+# /etc/rc.local: /usr/local/bin/web-setup &
+#
+
+import time,os
+
+FILE='/tmp/setup.log'
+
+while 1:
+	try:
+		with open(FILE) as f:
+			action = f.read()
+			if action == 'reboot': os.system('reboot')
+			if action == 'shutdown': os.system('halt')
+		os.remove(FILE)
+	except:
+		pass
+
+	time.sleep(5)
+
