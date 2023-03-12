@@ -15,7 +15,6 @@ while 1:
 			action = f.read()
 			if action == 'reboot': os.system('reboot')
 			if action == 'shutdown': os.system('halt')
-		os.remove(FILE)
 	except:
 		pass
 
