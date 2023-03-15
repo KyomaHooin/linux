@@ -4,9 +4,9 @@
 # https://gist.github.com/vhdm/f6e42479e1fb9f119d3d
 #
 
-$git_secret='VVBZKIJ65FDZPA44';
-$proton_secret='G3EJWXRJDZ26RV4757TDP4NLIFFJTZH4';
-$lab_secret='RXEFYPZXM3CCXYVYAOZCVR2BP7L4QGNI';
+$git_secret='xxx';
+$proton_secret='xxx';
+$lab_secret='xxx';
 
 $raw = file_get_contents('php://input');
 
