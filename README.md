@@ -26,6 +26,7 @@ cesnet_tcs_tiny.py - Cesnet TCS "tiny" client.
         cisco-boot - Dynamips emulator rc script.
           firewall - Simple table firewall.
           git-init - Simple repo clone, init.
+              octo - Github JS CDN recurse.
              press - Notepad to CSV press.
              sound - CLI radio player.
             srvadm - Multiple SSH remote.

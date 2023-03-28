@@ -1,0 +1,21 @@
+#!/bin/bash
+#
+# Github JS CDN recurse
+#
+
+BASE='https://cdn.skypack.dev'
+
+get_uri () {
+	name=$(basename "$1")
+	if [ ! -f "$name" ]; then
+		echo "[*] Writing.. $name"
+		for exp in $(wget -q -O - "$BASE$1" | grep "[import|export]" | tee "$name"); do
+			if [[ "$exp" =~ .*"-/octokit".* ]] || [[ "$exp" =~ .*"-/@octokit".* ]] ; then
+				get_uri $(echo "$exp" | sed "s/'//g" | sed 's/"//g' | sed "s/;$//")
+			fi
+		done
+	fi
+}
+
+get_uri "/octokit"
+
