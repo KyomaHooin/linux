@@ -4,6 +4,7 @@ mail.proton.me##button[data-testid="cta:special-offer"]
 mail.proton.me##.button[data-testid="cta:upgrade-plan"]
 hn.cz##.paywall
 hn.cz##.paywall-dialog
+email.seznam.cz##.unread
 email.seznam.cz##.icon-warning
 email.seznam.cz##.warning
 ucet.seznam.cz##.warning
