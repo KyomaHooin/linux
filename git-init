@@ -4,7 +4,7 @@
 #
 
 if [ "$#" -eq 2 ]; then
-  git clone -b "$2" https://github.com/KyomaHooin/"$1"
+  git clone --depth 1 -b "$2" --single-branch https://github.com/KyomaHooin/"$1"
 elif [ "$#" -eq 1 ]; then
   git clone https://github.com/KyomaHooin/"$1"
 else
