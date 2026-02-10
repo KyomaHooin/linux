@@ -1,12 +1,20 @@
 #!/bin/bash
 #
-# ./git-init repo
+# ./git-init repo [brach]
 #
 
-git clone https://github.com/KyomaHooin/$1
-cd $1
+if [ "$#" -eq 2 ]; then
+  git clone -b "$2" https://github.com/KyomaHooin/"$1"
+elif [ "$#" -eq 1 ]; then
+  git clone https://github.com/KyomaHooin/"$1"
+else
+  exit 1
+fi
+
+cd "$1"
 git config --global user.name "KyomaHooin"
 git config --global user.email "kyomahooin@gmail.com"
 git remote remove origin
-git remote add origin ssh://git@github.com:/KyomaHooin/$1
+git remote add origin ssh://git@github.com:/KyomaHooin/"$1"
 
+exit 0 
