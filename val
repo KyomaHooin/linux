@@ -1,0 +1,128 @@
+#!/bin/sh
+#VALURUS (R)EPLICATOR
+
+case "$1" in
+	--help)
+		echo "----------------------------------------
+		PRE-INSTALL UPGRADE, MAY CHANGE KERNEL!
+		APT-GET -f INSTALL, CHECK OUT REQUIRED.
+		(Do not delete your kernel!)
+		
+		BOOT:
+		
+		/etc/init.d/boootclean.sh
+
+		PACKAGE:
+
+		apache2, tcpdump, traceroute, nmap, nessus,
+		arping, whois, tp-ssl, lm-sensors, netcat,
+		ipcalc, host, hydra, nemesis, cryptsetup,
+		minicom, dnsutils, gpg, chrootkit, keyring,
+		postfix, mutt, icecast2, dhcp3-server, vim,
+		mc, file, uml-utilities, ppp, nemesis, vpnc,
+		python, openssl, debian-backports-keyring,
+		unzip, lynx, ysm, less, cdw, pdf-utils,	zip,
+		chkrootkit, iftop, psiconv, bzip2, rar,
+		unrar, expect, iwconfig, nut, apcupsd, mdadm
+		nemesis, hydra, yersinia, dynagen, walrus,
+		ipv6calc, mailx, pstree, lpr, rsync
+
+		IP:
+
+		/etc/hosts
+		/etc/networks
+		/etc/init.d/firewall
+		/etc/network/interfaces
+
+		DNS:
+
+		@	A	IP
+		www	A	IP
+		@	AAAA	IP6
+		@	MX:1	valur.us.
+		@	NS	NS1
+		@	NS	NS2
+	
+		MOUNT:
+
+		mount -o loop  -t iso9660 *.iso /mnt/iso
+		mount /dev/hde1 /mnt/cf
+		mknod /dev /sda b 8 0
+		mknod /dev /sda1 b 8 1
+
+		CRYPTO:
+	
+		cd /root
+		dd if=/dev/urandom of=crypto bs=1M count=10
+		losetup /dev/loop/0 crypto
+		cryptsetup luksFormat /dev/sda1
+		cryptsetup luksOpen /dev/sda1 crypto
+		mkfs.ext3 /dev/mapper/crypto
+		mount /dev/mapper/crypto /mnt/crypto/
+		losetup /dev/loop/0 crypto
+		cryptsetup luksOpen /dev/sda1 crypto
+		mount /dev/mapper/crypto /mnt/crypto/
+		umount /mnt/crypto
+		cryptsetup luksClose /dev/mapper/crypto
+		losetup -d /dev/loop/0
+
+		CISCO:
+
+		[dynamips] (libelf1, alien)
+		[dynagen] (python, bridge-utils, uml-utilities)
+		
+		HACK:
+
+		[yersinia] (libpcap0.8-dev, libnet1-dev,
+			pkg-config, gcc)
+
+		./confugre --disable-gtk
+		/src/terminal.c
+
+		WIKI:
+
+		[GD] (php5-gd)
+		[APC 3.0.12] (apache2-threaded-dev, php5-dev,
+			php5-cli, php5-pear, make, gcc,
+			g++)
+		phpize
+		./confgure --enable-apc --enable-apc-mmap
+		make
+		make install
+		extension=\"apc.so\" >> /etc/php5/apache2/php.ini
+
+		BACKUP:
+
+		rsync -av /dir/path .. /dst
+
+		--------------------------------------------------------"\
+		> /dev/null; cat /usr/sbin/val | more
+	;;
+	-R)
+		if [ -e "$1" ]; then
+			if [ `expr substr $1 1 1` = "/" ]; then
+				rm -i /usr/src/V$1
+				else
+ 					rm -i /usr/src/V$PWD/$1
+			fi
+		fi
+	;;
+	-B)
+		mount /dev/sda1 /mnt/hd 2> /dev/null &
+		sleep 5
+	
+		if [ -d "/mnt/hd/R" ]; then
+			#rsync -av /usr/src/ --exclude=/theorist/ /mnt/hd/
+			rsync -av /usr/src/ /mnt/hd/ && umount /mnt/hd && sync
+		fi				
+	;;
+esac
+	if ! [ -e "$1" ]; then echo "USAGE: val [mirror] -R [remove] -B [ --help ]"
+		elif [ `expr substr $1 1 1` = "/" ]; then
+			cp -v -u -r -P --parents $1 /usr/src/V
+		#	scp -r $1 root@vrr:/array/V$1
+		else
+			cp -v -u -r -P --parents $PWD/$1 /usr/src/V
+		# 	scp -r $PWD/$1 root@vrr:/array/V$PWD
+	fi
+exit 0

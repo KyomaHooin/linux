@@ -1,0 +1,63 @@
+#!/bin/sh
+#BOX (R)EPLICATOR
+
+case "$1" in
+	--help)
+		echo "----------------------------------------
+		PRE-INSTALL UPGRADE, MAY CHANGE KERNEL!
+		APT-GET -f INSTALL, CHECK OUT REQUIRED.
+		(Do not delete your kernel!)
+		
+		BOOT:
+		
+		/etc/init.d/boootclean.sh
+
+		PACKAGE:
+
+		tcpdump, traceroute, arping, whois, netcat,
+		ipcalc, host, mc, unzip, lynx, less, zip,
+		rar
+
+		IP:
+
+		/etc/hosts
+		/etc/networks
+		/etc/init.d/firewall
+		/etc/network/interfaces
+
+		MOUNT:
+
+		mount -o loop  -t iso9660 *.iso /mnt/iso
+		mount /dev/hde1 /mnt/cf
+		mknod /dev /sda b 8 0
+		mknod /dev /sda1 b 8 1
+
+		CRYPTO:
+	
+		cd /root
+		dd if=/dev/urandom of=crypto bs=1M count=10
+		losetup /dev/loop/0 crypto
+		cryptsetup luksFormat /dev/sda1
+		cryptsetup luksOpen /dev/sda1 crypto
+		mkfs.ext3 /dev/mapper/crypto
+		mount /dev/mapper/crypto /mnt/crypto/
+		losetup /dev/loop/0 crypto
+		cryptsetup luksOpen /dev/sda1 crypto
+		mount /dev/mapper/crypto /mnt/crypto/
+		umount /mnt/crypto
+		cryptsetup luksClose /dev/mapper/crypto
+		losetup -d /dev/loop/0
+
+		--------------------------------------------------------"\
+		> /dev/null; cat /usr/sbin/box | more
+	;;
+esac
+	if ! [ -e "$1" ]; then echo "USAGE: box [mirror] [ --help ]"
+		elif [ `expr substr $1 1 1` = "/" ]; then
+ 			scp -r $1 root@val:/mnt/self/BOX$1
+ 			scp -r $1 root@val:/mnt/repl/BOX$1
+		else
+ 			scp -r $PWD/$1 root@val:/mnt/self/BOX$PWD
+ 			scp -r $PWD/$1 root@val:/mnt/repl/BOX$PWD
+	fi
+exit 0

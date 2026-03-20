@@ -1,0 +1,40 @@
+#!/bin/sh
+#IP Watchdog
+#
+
+OLDIP=`cat /root/ip`
+OLDNET=`cat /root/net`
+
+ifconfig eth1 > /root/tmp 2> /dev/null
+
+NEWIP=`cat /root/tmp | grep "inet addr" | cut -d: -f2 | cut -d\  -f1`
+#NEW6IP=`ipv6calc --in ipv4addr --out ipv6addr --action conv6to4 $NEWIP | cut -d: -f2-3`
+
+if ! [ "$NEWIP" = "" ]; then
+
+	N1=`echo $NEWIP | cut -d. -f1`
+	N2=`echo $NEWIP | cut -d. -f2`
+	N3=`echo $NEWIP | cut -d. -f3`
+	NEWNET=`echo $N1.$N2.$N3.0`
+
+	if ! [ "$OLDIP" = "$NEWIP" ]; then
+
+		sed -i s/$OLDIP/$NEWIP/ /etc/init.d/firewall 2> /dev/null
+		sed -i s/$OLDIP/$NEWIP/ /etc/hosts 2> /dev/null 
+		sed -i s/$OLDNET/$NEWNET/ /etc/networks 2> /dev/null
+
+		cd /etc/init.d
+
+		./firewall > /dev/null &
+
+		#mutt -s "VIP" Richard.Bruna@uiv.cz < /root/tmp 2> /dev/null
+
+		echo $NEWIP > /root/ip
+		echo $NEWNET > /root/net
+	#	echo $NEW6IP > /root/ip6
+	fi
+fi
+
+rm /root/tmp 2> /dev/null &
+
+exit 0

@@ -1,0 +1,16 @@
+#!/bin/sh
+
+POWERDOWN=`cat /var/mail/root | grep "Power failure"` 
+POWERUP=`cat /var/mail/root | grep "Power has returned"` 
+
+if ! [ "" == "$POWERDOWN" ]; then
+ echo "UPS power lost, running on batteries." | gnokii --sendsms +420722192058 > /dev/null
+ echo > /var/mail/root
+fi
+
+if ! [ "" == "POWERUP" ]; then
+ echo "UPS power has returned." | gnokii --sendsms +420722192058 > /dev/null
+ echo > /var/mail/root
+fi
+
+exit 0
