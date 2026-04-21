@@ -8,6 +8,7 @@ novinky.cz##.warning
 
 ||accounts.google.com/gsi/*
 google.com##span:has-text(/Režim AI/)
+google.com##span:has-text(/AI モード/)
 
 csfd.cz##.top-nav-new
 csfd.cz##.new
