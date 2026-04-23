@@ -7,6 +7,8 @@ seznam.cz##.warning
 seznamzpravy.cz##.warning
 novinky.cz##.warning
 
+idnes.cz##iframe
+
 ||accounts.google.com/gsi/*
 google.com##span:has-text(/Režim AI/)
 google.com##span:has-text(/AI モード/)
