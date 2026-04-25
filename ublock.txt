@@ -21,6 +21,6 @@ csfd.cz##.new
 
 root.cz##li:has(a[href="/uzivatel/666985/"])
 
-super.cz##div.banner-wrpper
+super.cz##div.banner-wrapper
 super.cz##div.dynamic__banner
 super.cz##div.dynamic__banner-ad
