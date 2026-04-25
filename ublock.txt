@@ -2,8 +2,10 @@
 proton.me##li:has(button[data-testid="cta:special-offer"])
 proton.me##div:has(button.button-promotion)
 
+seznam.cz##div.ogm-branding-dog
 seznam.cz##a.nomobile
 seznam.cz##.warning
+seznam.cz##.icon-warning
 seznamzpravy.cz##.warning
 novinky.cz##.warning
 
@@ -11,9 +13,14 @@ idnes.cz##iframe
 
 ||accounts.google.com/gsi/*
 google.com##span:has-text(/Režim AI/)
+google.cz##span:has-text(/Režim AI/)
 google.com##span:has-text(/AI モード/)
 
 csfd.cz##.top-nav-new
 csfd.cz##.new
 
 root.cz##li:has(a[href="/uzivatel/666985/"])
+
+super.cz##div.banner-wrpper
+super.cz##div.dynamic__banner
+super.cz##div.dynamic__banner-ad
