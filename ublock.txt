@@ -2,6 +2,7 @@
 proton.me##li:has(button[data-testid="cta:special-offer"])
 proton.me##div:has(button.button-promotion)
 
+seznam.cz##a.nomobile[data-dot="seznam"]
 seznam.cz##div.ogm-branding-dog
 seznam.cz##.warning
 seznam.cz##.icon-warning
